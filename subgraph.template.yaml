@@ -1,0 +1,38 @@
+specVersion: 0.0.2
+description: Fixed-rate lending protocol on Ethereum
+repository: https://github.com/mainframehq/mainframe-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: BalanceSheet
+    network: {{network}}
+    source:
+      abi: BalanceSheet
+      address: "{{contracts.balanceSheet.address}}"
+      startBlock: {{contracts.balanceSheet.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: BalanceSheet
+          file: ./abis/BalanceSheet.json
+      entities:
+        - CToken
+      eventHandlers:
+        - event: ClutchCollateral(indexed address,indexed address,indexed address,uint256)
+          handler: handleClutchCollateral
+        - event: DepositCollateral(indexed address,indexed address,uint256)
+          handler: handleDepositCollateral
+        - event: FreeCollateral(indexed address,indexed address,uint256)
+          handler: handleFreeCollateral
+        - event: LockCollateral(indexed address,indexed address,uint256)
+          handler: handleLockCollateral
+        - event: OpenVault(indexed address,indexed address)
+          handler: handleOpenVault
+        - event: SetVaultDebt(indexed address,indexed address,uint256,uint256)
+          handler: handleSetVaultDebt
+        - event: WithdrawCollateral(indexed address,indexed address,uint256)
+          handler: handleWithdrawCollateral
+      file: ./src/mappings/balanceSheet.ts
+      language: wasm/assemblyscript

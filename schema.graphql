@@ -1,0 +1,27 @@
+### Generic ###
+
+type Token @entity {
+  id: ID!
+  decimals: Int
+  name: String
+  symbol: String
+}
+
+### Balance Sheet ###
+
+type Vault @entity {
+  id: ID!
+  debt: BigInt!
+  freeCollateral: BigInt!
+  lockedCollateral: BigInt!
+  isOpen: Boolean!
+}
+
+### Fintroller ###
+
+type Fintroller @entity {
+  id: ID!
+  liquidationIncentive: BigInt!
+  debtCeiling: BigInt!
+  oracle: Bytes!
+}
