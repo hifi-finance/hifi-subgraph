@@ -18,7 +18,7 @@ dataSources:
         - name: BalanceSheet
           file: ./abis/BalanceSheet.json
       entities:
-        - CToken
+        - Vault
       eventHandlers:
         - event: ClutchCollateral(indexed address,indexed address,indexed address,uint256)
           handler: handleClutchCollateral
@@ -35,4 +35,56 @@ dataSources:
         - event: WithdrawCollateral(indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
       file: ./src/mappings/balanceSheet.ts
+      language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: Fintroller
+    network: {{network}}
+    source:
+      abi: Fintroller
+      address: "{{contracts.fintroller.address}}"
+      startBlock: {{contracts.fintroller.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: Fintroller
+          file: ./abis/Fintroller.json
+      entities:
+        - Fintroller
+      eventHandlers:
+        - event: SetDebtCeiling(indexed address,indexed address,uint256,uint256)
+          handler: handleSetDebtCeiling
+        - event: SetLiquidationIncentive(indexed address,uint256,uint256)
+          handler: handleSetLiquidationIncentive
+        - event: SetOracle(indexed address,address,address)
+          handler: handleSetOracle
+      file: ./src/mappings/fintroller.ts
+      language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: hfyUSDC (2021-22-01)
+    network: {{network}}
+    source:
+      abi: FyToken
+      address: "{{contracts.hfyUSDC (2021-22-01).address}}"
+      startBlock: {{contracts.hfyUSDC (2021-22-01).startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: FyToken
+          file: ./abis/FyToken.json
+      entities:
+        - FyToken
+      eventHandlers:
+        - event: Borrow(indexed address,uint256)
+          handler: handleBorrow
+        - event: LiquidateBorrow(indexed address,indexed address,uint256,uint256)
+          handler: handleLiquidateBorrow
+        - event: RepayBorrow(indexed address,indexed address,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: SetFintroller(indexed address,address,address)
+          handler: handleSetFintroller
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/fintroller.ts
       language: wasm/assemblyscript

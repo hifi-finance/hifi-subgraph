@@ -2,9 +2,9 @@
 
 type Token @entity {
   id: ID!
-  decimals: Int
-  name: String
-  symbol: String
+  decimals: Int!
+  name: String!
+  symbol: String!
 }
 
 ### Balance Sheet ###
@@ -21,7 +21,21 @@ type Vault @entity {
 
 type Fintroller @entity {
   id: ID!
-  liquidationIncentive: BigInt!
   debtCeiling: BigInt!
+  liquidationIncentive: BigInt!
   oracle: Bytes!
+}
+
+### FyToken
+
+type FyToken @entity {
+  id: ID!
+  collateral: Token
+  collateralPrecisionScalar: BigInt!
+  expirationTime: BigInt!
+  name: String!
+  symbol: String!
+  totalSupply: BigInt!
+  underlying: Token
+  underlyingPrecisionScalar: BigInt!
 }
