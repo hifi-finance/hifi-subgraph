@@ -1,41 +1,293 @@
-### Generic ###
-
-type Token @entity {
+"""
+Account is an Ethereum address, with a list of all the fyTokens
+and the fyTokens the user is in, along with liquidation information.
+"""
+type Account @entity {
+  "User Ethereum address"
   id: ID!
-  decimals: Int!
-  name: String!
-  symbol: String!
+  "Array of fyTokens user has opened a vault in"
+  accountFyTokens: [AccountFyToken!]! @derivedFrom(field: "account")
+  "How many times the user has been liquidated"
+  countLiquidated: Int!
+  "How many times the user has liquidated others"
+  countLiquidator: Int!
+  "Array of vaults opened by the user"
+  vaults: [Vault!] @derivedFrom(field: "account")
 }
 
-### Balance Sheet ###
-
-type Vault @entity {
+"""
+AccountFyToken is a single account within a single fyToken contract.
+"""
+type AccountFyToken @entity {
+  "FyToken address concatenated with user Ethereum address"
   id: ID!
-  debt: BigInt!
-  freeCollateral: BigInt!
-  lockedCollateral: BigInt!
-  isOpen: Boolean!
+  "One-to-one relation to Account"
+  account: Account!
+  "One-to-one relation to FyToken"
+  fyToken: FyToken!
+  "fyToken balance of the user"
+  fyTokenBalance: BigDecimal!
+  "Total amount of fyTokens borrowed"
+  totalFyTokenBorrowed: BigDecimal!
+  "Total amount of fyTokens repaid"
+  totalFyTokenRepaid: BigDecimal!
+  "Total amount of underlying supplied"
+  totalUnderlyingSupplied: BigDecimal!
+  "Total amount of underling redeemed"
+  totalUnderlyingRedeemed: BigDecimal!
+  "Transactions data"
+  transactions: [AccountFyTokenTransaction!]! @derivedFrom(field: "accountFyToken")
+  "One-to-one relation to Vault"
+  vault: Vault!
 }
 
-### Fintroller ###
+"""
+Auxiliary entity for AccountFyToken.
+"""
+type AccountFyTokenTransaction implements Transaction @entity {
+  "User Ethereum address concatenated with transaction hash concatenated with log index"
+  id: ID!
+  "One-to-one relation to AccountFyToken"
+  accountFyToken: AccountFyToken!
+  "Block number"
+  blockNumber: BigInt!
+  "Transaction log index"
+  logIndex: BigInt!
+  "Block timestamp"
+  timestamp: BigInt!
+  "Transaction hash"
+  txHash: Bytes!
+}
 
+"""
+Stores high-level variables for a Fintroller contract.
+"""
 type Fintroller @entity {
+  "Always set to 1"
   id: ID!
-  debtCeiling: BigInt!
-  liquidationIncentive: BigInt!
+  "One-to-many relation to FyToken"
+  fyTokens: [FyToken!] @derivedFrom(field: "fintroller")
+  "Discount on collateral that liquidators receive"
+  liquidationIncentive: BigDecimal!
+  "Price oracle"
   oracle: Bytes!
 }
 
-### FyToken
-
-type FyToken @entity {
+"""
+Stores high-level variables for a fyToken.
+"""
+type FyToken implements Token @entity {
+  "Contract address"
   id: ID!
-  collateral: Token
-  collateralPrecisionScalar: BigInt!
+  "One-to-one relation to collateral"
+  collateral: Token!
+  "Erc20 decimals"
+  decimals: BigInt!
+  "Limits how much debt can be issued"
+  debtCeiling: BigDecimal!
+  "Unix timestamp in seconds when the bond expires"
   expirationTime: BigInt!
+  "One-to-one relation to Fintroller"
+  fintroller: Fintroller!
+  "Erc20 name"
   name: String!
+  "Erc20 symbol"
   symbol: String!
+  "Erc20 total supply"
   totalSupply: BigInt!
-  underlying: Token
-  underlyingPrecisionScalar: BigInt!
+  "One-to-on relation to underlying"
+  underlying: Token!
+  "One-to-many relation to Vault"
+  vaults: [Vault!] @derivedFrom(field: "fyToken")
+}
+
+"""
+Stores high-level variables for a fyToken's redemption pool.
+"""
+type RedemptionPool @entity {
+  "FyToken address"
+  id: ID!
+  "One-to-one relation to FyTOken"
+  fyToken: FyToken!
+  "Total amount of underlying supplied"
+  totalUnderlyingSupply: BigDecimal!
+}
+
+"""
+Generic type for Erc20 tokens.
+"""
+type Token @entity {
+  "Contract address"
+  id: ID!
+  "Erc20 decimals"
+  decimals: Int!
+  "Erc20 name"
+  name: String!
+  "Erc20 symbol"
+  symbol: String!
+}
+
+"""
+Generic type for Ethereum transactions.
+"""
+type Transaction @entity {
+  "Transaction hash concatenated with the log index"
+  id: ID!
+  "Block number"
+  blockNumber: Int!
+  "Transaction log index"
+  logIndex: Int!
+  "Block timestamp"
+  timestamp: Int!
+  "Transaction hash"
+  txHash: Bytes!
+}
+
+"""
+Stores the collateral deposited by the user, along with the debt.
+"""
+type Vault @entity {
+  "FyToken address concatenated with user Ethereum address"
+  id: ID!
+  "One-to-one relation to Account"
+  account: Account!
+  "Debt owed by the vault owner"
+  debt: BigInt!
+  "Collateral deposited"
+  freeCollateral: BigInt!
+  "One-to-one relation to FyToken"
+  fyToken: FyToken!
+  "Collateral deposited and locked to issue deb"
+  lockedCollateral: BigInt!
+  "Vault open state"
+  isOpen: Boolean!
+}
+
+"""
+Stores information for borrows.
+"""
+type BorrowEvent implements FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "Amount of fyTokens borrowed"
+  amount: BigDecimal!
+  "Account that borrowed the fyTokens"
+  borrower: Bytes!
+  "Block number"
+  blockNumber: Int!
+  "Symbol of the borrowed fyToken"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+}
+
+"""
+Stores information for burns. `To` address will always be a fyToken.
+"""
+type BurnEvent implements FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "fyTokens transferred"
+  amount: BigDecimal!
+  "Block number"
+  blockNumber: Int!
+  "Account that burnt tokens"
+  from: Bytes!
+  "Symbol of the fyToken transferred"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+  "Account that received tokens (FyToken contract)"
+  to: Bytes!
+}
+
+"""
+Will be stored for every mint, burn, borrow, repay borrow, liquidate borrow,
+and any normal transfer between two accounts. MintEvent, BurnEvent, BorrowEvent,
+RepayBorrowEvent and LiquidationEvent all implement this type.
+"""
+type FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "fyTokens transferred"
+  amount: BigDecimal!
+  "Block number"
+  blockNumber: Int!
+  "Account that sent tokens"
+  from: Bytes!
+  "Symbol of the fyToken transferred"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+  "Account that received tokens"
+  to: Bytes!
+}
+
+"""
+Stores information for liquidations. The event is emitted from the fyToken.
+"""
+type LiquidateBorrowEvent implements FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "Amount of fyTokens repaid by liquidator"
+  amount: BigDecimal!
+  "Collateral seized"
+  clutchedCollateralAmount: BigDecimal!
+  "Block number"
+  blockNumber: Int!
+  "Collateral that was clutched by liquidator"
+  collateralSymbol: String!
+  "Account liquidated (borrower)"
+  from: Bytes!
+  "Symbol of the fyToken repaid through liquidation"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+  "Liquidator receiving tokens"
+  to: Bytes!
+}
+
+"""
+Stores information for mints. `From` address will always be a fyToken.
+"""
+type MintEvent implements FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "fyTokens transferred"
+  amount: BigDecimal!
+  "Block number"
+  blockNumber: Int!
+  "Collateral token amount transferred"
+  collateralAmount: BigDecimal
+  "Account that sent tokens (FyToken contract)"
+  from: Bytes!
+  "Symbol of the fyToken transferred"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+  "Account that received tokens (minter)"
+  to: Bytes!
+}
+
+"""
+Stores information for repays. Payer is not always the same as borrower,
+such as in the event of a liquidation.
+"""
+type RepayBorrowEvent implements UnderlyingTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "Account that borrowed the tokens"
+  borrower: Bytes!
+  "Block number"
+  blockNumber: Int!
+  "Debt still owed by the borrower"
+  newDebt: BigDecimal!
+  "Symbol of the fyToken transferred"
+  fyTokenSymbol: String!
+  "Payer of the borrowed funds"
+  payer: Bytes!
+  "Amount of fyTokens repaid"
+  repayAmount: BigDecimal!
+  "Block timestamp"
+  timestamp: Int!
 }

@@ -1,13 +1,22 @@
-import { Fintroller } from "../types/schema";
-import { SetDebtCeiling, SetLiquidationIncentive, SetOracle } from "../types/Fintroller/Fintroller";
+import { Fintroller, FyToken } from "../types/schema";
+import { log } from "@graphprotocol/graph-ts";
 
-function loadOrCreateFintroller(): Fintroller {
-  const id: string = "1";
-  let fintroller: Fintroller | null = Fintroller.load(id);
-  if (fintroller == null) {
-    fintroller = new Fintroller(id);
+import { ListBond, SetDebtCeiling, SetLiquidationIncentive, SetOracle } from "../types/Fintroller/Fintroller";
+import { loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
+
+export function handleListBond(event: ListBond): void {
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  let fyToken: FyToken | null = FyToken.load(fyTokenAddress);
+  if (fyToken != null) {
+    log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenAddress]);
+    return;
   }
-  return fintroller;
+
+  let fintroller: Fintroller = loadOrCreateFintroller();
+  fintroller.save();
+
+  fyToken = loadOrCreateFyToken(fyTokenAddress);
+  fyToken.save();
 }
 
 export function handleSetDebtCeiling(event: SetDebtCeiling): void {

@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import { log } from "@graphprotocol/graph-ts";
 
 import {
@@ -10,15 +9,16 @@ import {
   SetVaultDebt,
   WithdrawCollateral,
 } from "../types/BalanceSheet/BalanceSheet";
-import { Vault } from "../types/schema";
+import { Fintroller, FyToken, Vault } from "../types/schema";
+import { createVault, loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
 
 export function handleClutchCollateral(event: ClutchCollateral): void {
-  const fyToken: string = event.params.fyToken.toString();
   const borrower: string = event.params.borrower.toString();
-  const id: string = fyToken + "-" + borrower;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = borrower.concat("-").concat(fyTokenAddress);
   let vault: Vault | null = Vault.load(id);
   if (vault == null) {
-    log.error("Vault expected to exist when clutching collateral: {}-{}", [fyToken, borrower]);
+    log.error("Vault entity expected to exist when clutching collateral: {}-{}", [fyTokenAddress, borrower]);
     return;
   }
   vault.lockedCollateral = vault.lockedCollateral.minus(event.params.clutchedCollateralAmount);
@@ -26,12 +26,12 @@ export function handleClutchCollateral(event: ClutchCollateral): void {
 }
 
 export function handleDepositCollateral(event: DepositCollateral): void {
-  const fyToken: string = event.params.fyToken.toString();
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
   if (vault == null) {
-    log.error("Vault expected to exist when depositing collateral: {}-{}", [fyToken, account]);
+    log.error("Vault entity expected to exist when depositing collateral: {}-{}", [fyTokenAddress, account]);
     return;
   }
   vault.freeCollateral = vault.freeCollateral.plus(event.params.collateralAmount);
@@ -39,12 +39,12 @@ export function handleDepositCollateral(event: DepositCollateral): void {
 }
 
 export function handleFreeCollateral(event: FreeCollateral): void {
-  const fyToken: string = event.params.fyToken.toString();
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
   if (vault == null) {
-    log.error("Vault expected to exist when freeing collateral: {}-{}", [fyToken, account]);
+    log.error("Vault entity expected to exist when freeing collateral: {}-{}", [fyTokenAddress, account]);
     return;
   }
   vault.freeCollateral = vault.freeCollateral.plus(event.params.collateralAmount);
@@ -53,12 +53,12 @@ export function handleFreeCollateral(event: FreeCollateral): void {
 }
 
 export function handleLockCollateral(event: LockCollateral): void {
-  const fyToken: string = event.params.fyToken.toString();
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
   if (vault == null) {
-    log.error("Vault expected to exist when locking collateral: {}-{}", [fyToken, account]);
+    log.error("Vault entity expected to exist when locking collateral: {}-{}", [fyTokenAddress, account]);
     return;
   }
   vault.freeCollateral = vault.freeCollateral.minus(event.params.collateralAmount);
@@ -67,28 +67,31 @@ export function handleLockCollateral(event: LockCollateral): void {
 }
 
 export function handleOpenVault(event: OpenVault): void {
-  const fyToken: string = event.params.fyToken.toString();
+  let fintroller: Fintroller = loadOrCreateFintroller();
+  fintroller.save();
+
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  let fyToken: FyToken = loadOrCreateFyToken(fyTokenAddress);
+  fyToken.save();
+
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
   if (vault != null) {
-    log.error("Vault expected to be null when opened: {}-{}", [fyToken, account]);
+    log.error("Vault entity expected to be null when opened: {}-{}", [fyTokenAddress, account]);
     return;
   }
-  vault.debt = BigInt.fromI32(0);
-  vault.freeCollateral = BigInt.fromI32(0);
-  vault.isOpen = true;
-  vault.lockedCollateral = BigInt.fromI32(0);
+  vault = createVault(fyTokenAddress, account);
   vault.save();
 }
 
 export function handleSetVaultDebt(event: SetVaultDebt): void {
-  const fyToken: string = event.params.fyToken.toString();
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
-  if (vault != null) {
-    log.error("Vault expected to be null when opened: {}-{}", [fyToken, account]);
+  if (vault == null) {
+    log.error("Vault entity expected to exist when the debt is set: {}-{}", [fyTokenAddress, account]);
     return;
   }
   vault.debt = event.params.newDebt;
@@ -96,12 +99,12 @@ export function handleSetVaultDebt(event: SetVaultDebt): void {
 }
 
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
-  const fyToken: string = event.params.fyToken.toString();
   const account: string = event.params.account.toString();
-  const id: string = fyToken + "-" + account;
+  const fyTokenAddress: string = event.params.fyToken.toString();
+  const id: string = fyTokenAddress.concat("-").concat(account);
   let vault: Vault | null = Vault.load(id);
   if (vault == null) {
-    log.error("Vault expected to exist when withdrawing collateral: {}-{}", [fyToken, account]);
+    log.error("Vault entity expected to exist when withdrawing collateral: {}-{}", [fyTokenAddress, account]);
     return;
   }
   vault.freeCollateral = vault.freeCollateral.minus(event.params.collateralAmount);

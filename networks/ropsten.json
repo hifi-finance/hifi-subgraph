@@ -8,10 +8,6 @@
     "fintroller": {
       "address": "0x9D65603416fF39107ec969D212ACa8BE1148352a",
       "startBlock": 8946751
-    },
-    "hfyUSDC (2021-22-01)": {
-      "address": "0xBf8a713183ce9228B99E7ad5d900030B8d0ADEE2",
-      "startBlock": 8946791
     }
   }
 }
