@@ -1,33 +1,37 @@
-import { Fintroller, FyToken } from "../types/schema";
 import { log } from "@graphprotocol/graph-ts";
 
 import { ListBond, SetDebtCeiling, SetLiquidationIncentive, SetOracle } from "../types/Fintroller/Fintroller";
-import { loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
+import { Fintroller, FyToken } from "../types/schema";
+import { createFyToken, loadOrCreateFintroller } from "../helpers/database";
 
 export function handleListBond(event: ListBond): void {
-  const fyTokenAddress: string = event.params.fyToken.toString();
-  let fyToken: FyToken | null = FyToken.load(fyTokenAddress);
+  loadOrCreateFintroller();
+
+  let fyTokenId: string = event.params.fyToken.toString();
+  let fyToken: FyToken | null = FyToken.load(fyTokenId);
   if (fyToken != null) {
-    log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenAddress]);
+    log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenId]);
     return;
   }
-
-  let fintroller: Fintroller = loadOrCreateFintroller();
-  fintroller.save();
-
-  fyToken = loadOrCreateFyToken(fyTokenAddress);
-  fyToken.save();
+  createFyToken(fyTokenId);
 }
 
 export function handleSetDebtCeiling(event: SetDebtCeiling): void {
-  let fintroller: Fintroller = loadOrCreateFintroller();
-  fintroller.debtCeiling = event.params.newDebtCeiling;
-  fintroller.save();
+  loadOrCreateFintroller();
+
+  let fyTokenId: string = event.params.fyToken.toString();
+  let fyToken: FyToken | null = FyToken.load(fyTokenId);
+  if (fyToken == null) {
+    log.error("FyToken entity expected to be exist when setting the debt ceiling: {}", [fyTokenId]);
+    return;
+  }
+  fyToken.debtCeiling = event.params.newDebtCeiling.toBigDecimal();
+  fyToken.save();
 }
 
 export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {
   let fintroller: Fintroller = loadOrCreateFintroller();
-  fintroller.liquidationIncentive = event.params.newLiquidationIncentive;
+  fintroller.liquidationIncentiveMantissa = event.params.newLiquidationIncentive.toBigDecimal();
   fintroller.save();
 }
 

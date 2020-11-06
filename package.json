@@ -26,6 +26,7 @@
     "husky": "^4.3.0",
     "mustache": "^4.0.1",
     "prettier": "^2.1.2",
+    "shx": "^0.3.3",
     "typescript": "^4.0.5"
   },
   "homepage": "https://github.com/mainframehq/mainframe-subgraph#readme",
@@ -36,6 +37,7 @@
   },
   "scripts": {
     "build": "graph build --debug",
+    "clean": "shx rm -rf ./build ./src/types ./subgraph.yaml",
     "codegen": "graph codegen --debug --output-dir src/types/",
     "commit": "git-cz",
     "lint": "eslint --config ./.eslintrc.yaml --ignore-path ./.eslintignore --ext .js,.ts .",

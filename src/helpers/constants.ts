@@ -1,5 +1,9 @@
-import { Address, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-export const addressZero: Address = Address.fromString("0x0000000000000000000000000000000000000000");
-// Equivalent to 1100000000000000000.
-export const defaultLiquidationIncentive: BigInt = BigInt.fromUnsignedBytes(Bytes.fromHexString("0xde0b6b3a7640000"));
+export let addressZero: Address = Address.fromString("0x0000000000000000000000000000000000000000");
+// Equivalent to 1100000000000000000, or 110%.
+export let defaultLiquidationIncentive: BigDecimal = BigInt.fromI32(10)
+  .pow(18)
+  .plus(BigInt.fromI32(10).pow(17))
+  .toBigDecimal();
+export let fintrollerId: string = "1";

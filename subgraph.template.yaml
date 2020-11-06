@@ -89,6 +89,7 @@ templates:
         - LiquidateEvent
         - MintEvent
         - RepayBorrowEvent
+        - TransferEvent
       eventHandlers:
         - event: Borrow(indexed address,uint256)
           handler: handleBorrow
@@ -100,6 +101,8 @@ templates:
           handler: handleMint
         - event: RepayBorrow(indexed address,indexed address,uint256,uint256)
           handler: handleRepayBorrow
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
   - kind: ethereum/contract
     name: RedemptionPool
     network: {{network}}
