@@ -6,4 +6,5 @@ export let defaultLiquidationIncentive: BigDecimal = BigInt.fromI32(10)
   .pow(18)
   .plus(BigInt.fromI32(10).pow(17))
   .toBigDecimal();
-export let fintrollerId: string = "1";
+export let fintrollerDefaultId: string = "1";
+export let zeroBd: BigDecimal = BigDecimal.fromString("0");

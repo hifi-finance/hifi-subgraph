@@ -1,11 +1,36 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import { Account, AccountFyToken, AccountFyTokenTransaction, Fintroller, FyToken, Token, Vault } from "../types/schema";
+import {
+  Account,
+  AccountFyToken,
+  AccountFyTokenTransaction,
+  Fintroller,
+  FyToken,
+  RedemptionPool,
+  Token,
+  Vault,
+} from "../types/schema";
 import { Erc20 as Erc20Contract } from "../types/templates/FyToken/Erc20";
 import { Fintroller as FintrollerContract } from "../types/Fintroller/Fintroller";
 import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import { FyToken as FyTokenTemplate } from "../types/templates";
-import { addressZero, defaultLiquidationIncentive, fintrollerId } from "./constants";
+import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, zeroBd } from "./constants";
+
+export function getAccountFyTokenId(fyTokenId: string, accountId: string): string {
+  return fyTokenId.concat("-").concat(accountId);
+}
+
+export function getAccountFyTokenTransactionId(accountId: string, txHash: Bytes, logIndex: BigInt): string {
+  return accountId.concat("-").concat(txHash.toString()).concat("-").concat(logIndex.toString());
+}
+
+export function getEventId(txHash: Bytes, logIndex: BigInt): string {
+  return txHash.concat("-").concat(logIndex);
+}
+
+export function getVaultId(fyTokenId: string, accountId: string): string {
+  return getAccountFyTokenId(fyTokenId, accountId);
+}
 
 export function createAccount(id: string): Account {
   let account = new Account(id);
@@ -16,7 +41,7 @@ export function createAccount(id: string): Account {
 }
 
 export function createAccountFyToken(fyTokenId: string, accountId: string): AccountFyToken {
-  let id: string = fyTokenId.concat("-").concat(accountId);
+  let id: string = getAccountFyTokenId(fyTokenId, accountId);
   let accountFyToken: AccountFyToken = new AccountFyToken(id);
   accountFyToken.account = accountId;
   accountFyToken.fyToken = fyTokenId;
@@ -30,13 +55,14 @@ export function createAccountFyTokenTransaction(
   accountId: string,
   event: ethereum.Event,
 ): AccountFyTokenTransaction {
-  let accountFyTokenId: string = fyTokenId.concat("-").concat(accountId);
-  let id = accountId
-    .concat("-")
-    .concat(event.transaction.hash.toString())
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
-  let transaction: AccountFyTokenTransaction = new AccountFyTokenTransaction(id);
+  let accountFyTokenId: string = getAccountFyTokenId(fyTokenId, accountId);
+  event.transaction.has;
+  let transactionId: string = getAccountFyTokenTransactionId(
+    accountId,
+    event.transaction.hash,
+    event.transactionLogIndex,
+  );
+  let transaction: AccountFyTokenTransaction = new AccountFyTokenTransaction(transactionId);
   transaction.accountFyToken = accountFyTokenId;
   transaction.blockNumber = event.block.number.toI32();
   transaction.logIndex = event.transactionLogIndex;
@@ -47,7 +73,7 @@ export function createAccountFyTokenTransaction(
 }
 
 export function createFintroller(): Fintroller {
-  let fintroller = new Fintroller(fintrollerId);
+  let fintroller = new Fintroller(fintrollerDefaultId);
   fintroller.liquidationIncentiveMantissa = defaultLiquidationIncentive;
   fintroller.oracle = addressZero;
   fintroller.save();
@@ -89,26 +115,35 @@ export function createFyToken(id: string): FyToken {
   fyToken.collateral = collateralAddress;
   fyToken.decimals = fyTokenContract.decimals();
   fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenId).toBigDecimal();
-  fyToken.expirationTime = fyTokenContract.expirationTime();
-  fyToken.fintroller = fintrollerId; // The id of the Fintroller is always 1
+  fyToken.expirationTime = fyTokenContract.expirationTime().toI32();
+  fyToken.fintroller = fintrollerDefaultId;
   fyToken.name = fyTokenContract.name();
+  fyToken.redemptionPool = fyTokenContract.redemptionPool().toString();
   fyToken.symbol = fyTokenContract.symbol();
-  fyToken.totalSupply = fyTokenContract.totalSupply();
+  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal();
   fyToken.underlying = underlyingAddress;
   fyToken.save();
 
   return fyToken;
 }
 
+export function createRedemptionPool(id: string, fyTokenId: string): RedemptionPool {
+  let redemptionPool: RedemptionPool = new RedemptionPool(id);
+  redemptionPool.fyToken = fyTokenId;
+  redemptionPool.totalUnderlyingSupply = zeroBd;
+  return redemptionPool;
+}
+
 export function createVault(fyTokenId: string, accountId: string): Vault {
-  let id: string = fyTokenId.concat("-").concat(accountId);
+  // The Vault entity shares the id with the AccountFyToken entity.
+  let id: string = getVaultId(fyTokenId, accountId);
   let vault: Vault = new Vault(id);
   vault.account = accountId;
-  vault.debt = BigInt.fromI32(0);
-  vault.freeCollateral = BigInt.fromI32(0);
+  vault.debt = zeroBd;
+  vault.freeCollateral = zeroBd;
   vault.fyToken = fyTokenId;
   vault.isOpen = true;
-  vault.lockedCollateral = BigInt.fromI32(0);
+  vault.lockedCollateral = zeroBd;
   vault.save();
   return vault;
 }
@@ -122,7 +157,7 @@ export function loadOrCreateAccount(id: string): Account {
 }
 
 export function loadOrCreateAccountFyToken(fyTokenId: string, accountId: string): AccountFyToken {
-  let id: string = fyTokenId.concat("-").concat(accountId);
+  let id: string = getAccountFyTokenId(fyTokenId, accountId);
   let accountFyToken: AccountFyToken | null = AccountFyToken.load(id);
   if (accountFyToken == null) {
     accountFyToken = createAccountFyToken(fyTokenId, accountId);
@@ -131,7 +166,7 @@ export function loadOrCreateAccountFyToken(fyTokenId: string, accountId: string)
 }
 
 export function loadOrCreateFintroller(): Fintroller {
-  let fintroller: Fintroller | null = Fintroller.load(fintrollerId);
+  let fintroller: Fintroller | null = Fintroller.load(fintrollerDefaultId);
   if (fintroller == null) {
     fintroller = createFintroller();
   }

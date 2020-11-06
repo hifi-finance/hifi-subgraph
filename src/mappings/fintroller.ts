@@ -2,18 +2,23 @@ import { log } from "@graphprotocol/graph-ts";
 
 import { ListBond, SetDebtCeiling, SetLiquidationIncentive, SetOracle } from "../types/Fintroller/Fintroller";
 import { Fintroller, FyToken } from "../types/schema";
-import { createFyToken, loadOrCreateFintroller } from "../helpers/database";
+import { createFyToken, createRedemptionPool, loadOrCreateFintroller } from "../helpers/database";
 
 export function handleListBond(event: ListBond): void {
   loadOrCreateFintroller();
 
+  // Create the FyToken entity.
   let fyTokenId: string = event.params.fyToken.toString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   if (fyToken != null) {
     log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenId]);
     return;
   }
-  createFyToken(fyTokenId);
+  fyToken = createFyToken(fyTokenId);
+
+  // Create the RedemptionPool entity.
+  let redemptionPoolId: string = fyToken.redemptionPool;
+  createRedemptionPool(redemptionPoolId, fyTokenId);
 }
 
 export function handleSetDebtCeiling(event: SetDebtCeiling): void {

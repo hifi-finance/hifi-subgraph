@@ -54,6 +54,8 @@ dataSources:
           file: ./abis/Fintroller.json
       entities:
         - Fintroller
+        - FyToken
+        - RedemptionPool
       eventHandlers:
         - event: ListBond(indexed address,indexed address)
           handler: handleListBond
@@ -85,7 +87,6 @@ templates:
         - AccountFyTokenTransaction
         - BorrowEvent
         - BurnEvent
-        - FyToken
         - LiquidateEvent
         - MintEvent
         - RepayBorrowEvent
@@ -117,7 +118,9 @@ templates:
         - name: RedemptionPool
           file: ./abis/RedemptionPool.json
       entities:
+        - Account
         - AccountFyToken
+        - AccountFyTokenTransaction
         - RedemptionPool
       eventHandlers:
         - event: RedeemFyTokens(indexed address,uint256,uint256)

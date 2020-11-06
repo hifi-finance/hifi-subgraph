@@ -12,11 +12,17 @@ import {
   TransferEvent,
 } from "../types/schema";
 import { Borrow, Burn, LiquidateBorrow, Mint, RepayBorrow, Token, Transfer } from "../types/templates/FyToken/FyToken";
-import { createAccountFyTokenTransaction, loadOrCreateAccount, loadOrCreateAccountFyToken } from "../helpers/database";
+import {
+  createAccountFyTokenTransaction,
+  getAccountFyTokenId,
+  getEventId,
+  loadOrCreateAccount,
+  loadOrCreateAccountFyToken,
+} from "../helpers/database";
 
 export function handleBorrow(event: Borrow): void {
   let borrowerId: string = event.params.account.toString();
-  let borrowAmount: BigInt = event.params.repayAmount; // TODO: fix this typo in Solidity
+  let borrowAmount: BigInt = event.params.repayAmount.toBigDecimal(); // TODO: fix this typo in Solidity
 
   loadOrCreateAccount(borrowerId);
 
@@ -32,12 +38,9 @@ export function handleBorrow(event: Borrow): void {
   let fyToken: FyToken = FyToken.load(fyTokenId);
 
   // Create the BorrowEvent entity.
-  let borrowEventId: string = event.transaction.hash
-    .toString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
+  let borrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let borrowEvent: BorrowEvent = new BorrowEvent(borrowEventId);
-  borrowEvent.amount = borrowAmount.toBigDecimal();
+  borrowEvent.amount = borrowAmount;
   borrowEvent.borrower = event.params.account;
   borrowEvent.blockNumber = event.block.number.toI32();
   borrowEvent.fyTokenSymbol = fyToken.symbol;
@@ -52,7 +55,7 @@ export function handleBurn(event: Burn): void {
   let fyToken: FyToken = FyToken.load(fyTokenId.toString());
 
   // Create the BurnEvent entity.
-  let burnEventId: string = event.transaction.hash.toString().concat("-").concat(event.transactionLogIndex.toString());
+  let burnEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let burnEvent: BurnEvent = new BurnEvent(burnEventId);
   burnEvent.amount = event.params.burnAmount.toBigDecimal();
   burnEvent.blockNumber = event.block.number.toI32();
@@ -64,11 +67,24 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let borrowerAccount: Account = loadOrCreateAccount(event.params.borrower.toString());
+  let borrowerId: string = event.params.borrower.toString();
+  let borrowerAccount: Account = Account.load(borrowerId);
+  if (borrowerAccount == null) {
+    log.error("Borrower Account entity expected to exist when {}'s borrow is liquidated", [borrowerId]);
+    return;
+  }
   borrowerAccount.countLiquidated = borrowerAccount.countLiquidated + 1;
   borrowerAccount.save();
 
-  let liquidatorAccount: Account = loadOrCreateAccount(event.params.liquidator.toString());
+  let liquidatorId: string = event.params.liquidator.toString();
+  let liquidatorAccount: Account = Account.load(liquidatorId);
+  if (liquidatorAccount == null) {
+    log.error("Liquidator Account entity expected to exist when {}'s borrow is liquidated by {}", [
+      borrowerId,
+      liquidatorId,
+    ]);
+    return;
+  }
   liquidatorAccount.countLiquidator = liquidatorAccount.countLiquidator + 1;
   liquidatorAccount.save();
 
@@ -79,10 +95,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let collateral: Token = Token.load(fyToken.collateral);
 
   // Create the LiquidateBorrowEvent entity.
-  let liquidateBorrowEventId = event.transaction.hash
-    .toString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
+  let liquidateBorrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let liquidateBorrowEvent = new LiquidateBorrowEvent(liquidateBorrowEventId);
   liquidateBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
   liquidateBorrowEvent.blockNumber = event.block.number.toI32();
@@ -102,7 +115,7 @@ export function handleMint(event: Mint): void {
   let fyToken: FyToken = FyToken.load(fyTokenId.toString());
 
   // Create the MintEvent entity.
-  let mintEventId: string = event.transaction.hash.toString().concat("-").concat(event.transactionLogIndex.toString());
+  let mintEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let mintEvent: MintEvent = new MintEvent(mintEventId);
   mintEvent.amount = event.params.mintAmount.toBigDecimal();
   mintEvent.blockNumber = event.block.number.toI32();
@@ -117,11 +130,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let borrowerId: string = event.params.borrower.toString();
   let borrowerAccount: Account | null = Account.load(params.borrowerId);
   if (borrowerAccount == null) {
-    log.error("Account entity expected to exist when repaying borrow for {}", [borrowerId]);
+    log.error("Account entity expected to exist when {}'s borrow is repaid", [borrowerId]);
     return;
   }
 
-  let accountFyTokenId: string = fyTokenId.concat("-").concat(fromAccountId);
+  let accountFyTokenId: string = getAccountFyTokenId(fyTokenId, borrowerId);
   let accountFyToken: AccountFyToken | null = AccountFyToken.load(accountFyTokenId);
   if (accountFyToken == null) {
     log.error("AccountFyToken entity expected to exist when repaying borrow for {}", [fromAccountId]);
@@ -139,10 +152,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let fyToken: FyToken = FyToken.load(fyTokenId);
 
   // Create the RepayBorrowEvent entity.
-  let repayBorrowEventId: string = event.transaction.hash
-    .toString()
-    .concat("-")
-    .concat(event.transactionLogIndex.toString());
+  let repayBorrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let repayBorrowEvent: RepayBorrowEvent = new RepayBorrowEvent(repayBorrowEventId);
   repayBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
   repayBorrowEvent.blockNumber = event.block.number.toI32();
@@ -167,7 +177,7 @@ export function handleTransfer(event: Transfer): void {
       return;
     }
 
-    let accountFyTokenId: string = fyTokenId.concat("-").concat(fromAccountId);
+    let accountFyTokenId: string = getAccountFyTokenId(fyTokenId, fromAccountId);
     let accountFyToken: AccountFyToken | null = AccountFyToken.load(accountFyTokenId);
     if (accountFyToken == null) {
       log.error("AccountFyToken entity expected to exist when {} transferred {} tokens", [fromAccountId, fyTokenId]);
@@ -200,7 +210,7 @@ export function handleTransfer(event: Transfer): void {
   let fyToken: FyToken = FyToken.load(fyTokenId);
 
   // Create the TransferEvent entity.
-  let fyTransferId: string = event.transaction.hash.toString().concat("-").concat(event.transactionLogIndex.toString());
+  let fyTransferId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let fyTransfer = new TransferEvent(fyTransferId);
   fyTransfer.amount = event.params.amount.toBigDecimal();
   fyTransfer.from = event.params.from;
