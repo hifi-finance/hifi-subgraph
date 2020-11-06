@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import {
   Account,
@@ -56,7 +56,6 @@ export function createAccountFyTokenTransaction(
   event: ethereum.Event,
 ): AccountFyTokenTransaction {
   let accountFyTokenId: string = getAccountFyTokenId(fyTokenId, accountId);
-  event.transaction.has;
   let transactionId: string = getAccountFyTokenTransactionId(
     accountId,
     event.transaction.hash,
@@ -65,7 +64,7 @@ export function createAccountFyTokenTransaction(
   let transaction: AccountFyTokenTransaction = new AccountFyTokenTransaction(transactionId);
   transaction.accountFyToken = accountFyTokenId;
   transaction.blockNumber = event.block.number.toI32();
-  transaction.logIndex = event.transactionLogIndex;
+  transaction.logIndex = event.transactionLogIndex.toI32();
   transaction.timestamp = event.block.timestamp.toI32();
   transaction.txHash = event.transaction.hash;
   transaction.save();
