@@ -8,7 +8,7 @@ export function handleListBond(event: ListBond): void {
   loadOrCreateFintroller();
 
   // Create the FyToken entity.
-  let fyTokenId: string = event.params.fyToken.toString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   if (fyToken != null) {
     log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenId]);
@@ -24,7 +24,7 @@ export function handleListBond(event: ListBond): void {
 export function handleSetDebtCeiling(event: SetDebtCeiling): void {
   loadOrCreateFintroller();
 
-  let fyTokenId: string = event.params.fyToken.toString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   if (fyToken == null) {
     log.error("FyToken entity expected to be exist when setting the debt ceiling: {}", [fyTokenId]);

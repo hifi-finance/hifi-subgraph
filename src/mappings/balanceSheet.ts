@@ -13,8 +13,8 @@ import { Vault } from "../types/schema";
 import { createVault, getAccountFyTokenId, loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
 
 export function handleClutchCollateral(event: ClutchCollateral): void {
-  let borrowerId: string = event.params.borrower.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let borrowerId: string = event.params.borrower.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(borrowerId, fyTokenId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {
@@ -26,8 +26,8 @@ export function handleClutchCollateral(event: ClutchCollateral): void {
 }
 
 export function handleDepositCollateral(event: DepositCollateral): void {
-  let accountId: string = event.params.account.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let accountId: string = event.params.account.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {
@@ -39,8 +39,8 @@ export function handleDepositCollateral(event: DepositCollateral): void {
 }
 
 export function handleFreeCollateral(event: FreeCollateral): void {
-  let accountId: string = event.params.account.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let accountId: string = event.params.account.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {
@@ -53,8 +53,8 @@ export function handleFreeCollateral(event: FreeCollateral): void {
 }
 
 export function handleLockCollateral(event: LockCollateral): void {
-  let accountId: string = event.params.account.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let accountId: string = event.params.account.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {
@@ -69,10 +69,10 @@ export function handleLockCollateral(event: LockCollateral): void {
 export function handleOpenVault(event: OpenVault): void {
   loadOrCreateFintroller();
 
-  let fyTokenId: string = event.params.fyToken.toString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   loadOrCreateFyToken(fyTokenId);
 
-  let accountId: string = event.params.account.toString();
+  let accountId: string = event.params.account.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault != null) {
@@ -83,8 +83,8 @@ export function handleOpenVault(event: OpenVault): void {
 }
 
 export function handleSetVaultDebt(event: SetVaultDebt): void {
-  let accountId: string = event.params.account.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let accountId: string = event.params.account.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {
@@ -96,8 +96,8 @@ export function handleSetVaultDebt(event: SetVaultDebt): void {
 }
 
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
-  let accountId: string = event.params.account.toString();
-  let fyTokenId: string = event.params.fyToken.toString();
+  let accountId: string = event.params.account.toHexString();
+  let fyTokenId: string = event.params.fyToken.toHexString();
   let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
   let vault: Vault | null = Vault.load(vaultId);
   if (vault == null) {

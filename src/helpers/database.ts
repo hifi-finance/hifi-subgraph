@@ -21,7 +21,7 @@ export function getAccountFyTokenId(fyTokenId: string, accountId: string): strin
 }
 
 export function getAccountFyTokenTransactionId(accountId: string, txHash: Bytes, logIndex: BigInt): string {
-  return accountId.concat("-").concat(txHash.toString()).concat("-").concat(logIndex.toString());
+  return accountId.concat("-").concat(txHash.toHexString()).concat("-").concat(logIndex.toString());
 }
 
 export function getEventId(txHash: Bytes, logIndex: BigInt): string {
@@ -86,16 +86,16 @@ export function createFyToken(id: string): FyToken {
 
   // Load the FyToken contract and it variables.
   let fyTokenContract: FyTokenContract = FyTokenContract.bind(fyTokenId);
-  let collateralAddress: string = fyTokenContract.collateral().toString();
-  let fintrollerAddress: string = fyTokenContract.fintroller().toString();
-  let underlyingAddress: string = fyTokenContract.underlying().toString();
+  let collateralAddress: string = fyTokenContract.collateral().toHexString();
+  let fintrollerAddress: string = fyTokenContract.fintroller().toHexString();
+  let underlyingAddress: string = fyTokenContract.underlying().toHexString();
 
   // Load the Fintroller contract.
   let fintrollerContract: FintrollerContract = FintrollerContract.bind(Address.fromString(fintrollerAddress));
 
   // Load the collateral contract.
   let collateralContract: Erc20Contract = Erc20Contract.bind(Address.fromString(collateralAddress));
-  let collateral: Token = new Token(collateralAddress.toString());
+  let collateral: Token = new Token(collateralAddress);
   collateral.decimals = collateralContract.decimals();
   collateral.name = collateralContract.name();
   collateral.symbol = collateralContract.symbol();
@@ -103,7 +103,7 @@ export function createFyToken(id: string): FyToken {
 
   // Load the underlying contract.
   let underlyingContract: Erc20Contract = Erc20Contract.bind(Address.fromString(underlyingAddress));
-  let underlying: Token = new Token(underlyingAddress.toString());
+  let underlying: Token = new Token(underlyingAddress);
   underlying.decimals = underlyingContract.decimals();
   underlying.name = underlyingContract.name();
   underlying.symbol = underlyingContract.symbol();
@@ -117,7 +117,7 @@ export function createFyToken(id: string): FyToken {
   fyToken.expirationTime = fyTokenContract.expirationTime().toI32();
   fyToken.fintroller = fintrollerDefaultId;
   fyToken.name = fyTokenContract.name();
-  fyToken.redemptionPool = fyTokenContract.redemptionPool().toString();
+  fyToken.redemptionPool = fyTokenContract.redemptionPool().toHexString();
   fyToken.symbol = fyTokenContract.symbol();
   fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal();
   fyToken.underlying = underlyingAddress;

@@ -21,12 +21,12 @@ import {
 } from "../helpers/database";
 
 export function handleBorrow(event: Borrow): void {
-  let borrowerId: string = event.params.account.toString();
+  let borrowerId: string = event.params.account.toHexString();
   let borrowAmount: BigInt = event.params.repayAmount.toBigDecimal(); // TODO: fix this typo in Solidity
 
   loadOrCreateAccount(borrowerId);
 
-  let fyTokenId: string = event.address.toString();
+  let fyTokenId: string = event.address.toHexString();
   let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, borrowerId);
   accountFyToken.totalFyTokenBorrowed = accountFyToken.totalFyTokenBorrowed.plus(borrowAmount);
   accountFyToken.save();
@@ -51,8 +51,8 @@ export function handleBorrow(event: Borrow): void {
 export function handleBurn(event: Burn): void {
   // We can assume that the FyToken entity exists because bonds have to
   // be listed in the Fintroller before a burn can occur.
-  let fyTokenId: Address = event.address;
-  let fyToken: FyToken = FyToken.load(fyTokenId.toString());
+  let fyTokenId: string = event.address.toHexString();
+  let fyToken: FyToken = FyToken.load(fyTokenId);
 
   // Create the BurnEvent entity.
   let burnEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
@@ -62,12 +62,12 @@ export function handleBurn(event: Burn): void {
   burnEvent.from = event.params.account;
   burnEvent.fyTokenSymbol = fyToken.symbol;
   burnEvent.timestamp = event.block.timestamp.toI32();
-  burnEvent.to = fyTokenId;
+  burnEvent.to = Address.fromString(fyTokenId);
   burnEvent.save();
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  let borrowerId: string = event.params.borrower.toString();
+  let borrowerId: string = event.params.borrower.toHexString();
   let borrowerAccount: Account = Account.load(borrowerId);
   if (borrowerAccount == null) {
     log.error("Borrower Account entity expected to exist when {}'s borrow is liquidated", [borrowerId]);
@@ -76,7 +76,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   borrowerAccount.countLiquidated = borrowerAccount.countLiquidated + 1;
   borrowerAccount.save();
 
-  let liquidatorId: string = event.params.liquidator.toString();
+  let liquidatorId: string = event.params.liquidator.toHexString();
   let liquidatorAccount: Account = Account.load(liquidatorId);
   if (liquidatorAccount == null) {
     log.error("Liquidator Account entity expected to exist when {}'s borrow is liquidated by {}", [
@@ -90,8 +90,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
   // We can assume that the FyToken and the Collateral entity exists because bonds
   // have to be listed in the Fintroller before a liquidate borrow can occur.
-  let fyTokenId: Address = event.address;
-  let fyToken: FyToken = FyToken.load(fyTokenId.toString());
+  let fyTokenId: string = event.address.toHexString();
+  let fyToken: FyToken = FyToken.load(fyTokenId);
   let collateral: Token = Token.load(fyToken.collateral);
 
   // Create the LiquidateBorrowEvent entity.
@@ -111,15 +111,15 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 export function handleMint(event: Mint): void {
   // We can assume that the FyToken entity exists because bonds have to
   // be listed in the Fintroller before a mint can occur.
-  let fyTokenId: Address = event.address;
-  let fyToken: FyToken = FyToken.load(fyTokenId.toString());
+  let fyTokenId: string = event.address.toHexString();
+  let fyToken: FyToken = FyToken.load(fyTokenId.toHexString());
 
   // Create the MintEvent entity.
   let mintEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let mintEvent: MintEvent = new MintEvent(mintEventId);
   mintEvent.amount = event.params.mintAmount.toBigDecimal();
   mintEvent.blockNumber = event.block.number.toI32();
-  mintEvent.from = fyTokenId;
+  mintEvent.from = Address.fromString(fyTokenId);
   mintEvent.fyTokenSymbol = fyToken.symbol;
   mintEvent.timestamp = event.block.timestamp.toI32();
   mintEvent.to = event.params.account;
@@ -127,7 +127,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  let borrowerId: string = event.params.borrower.toString();
+  let borrowerId: string = event.params.borrower.toHexString();
   let borrowerAccount: Account | null = Account.load(params.borrowerId);
   if (borrowerAccount == null) {
     log.error("Account entity expected to exist when {}'s borrow is repaid", [borrowerId]);
@@ -144,7 +144,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   accountFyToken.totalFyTokenRepaid = accountFyToken.totalFyTokenRepaid.plus(repayAmount);
   accountFyToken.save();
 
-  let fyTokenId: string = event.address.toString();
+  let fyTokenId: string = event.address.toHexString();
   createAccountFyTokenTransaction(fyTokenId, borrowerId, event);
 
   // We can assume that the FyToken entity exists since bonds have to be
@@ -165,11 +165,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleTransfer(event: Transfer): void {
-  let fyTokenId: string = event.address.toString();
+  let fyTokenId: string = event.address.toHexString();
 
   // Check if the tx is FROM the fyToken contract itself. If so, it is a mint
   // and we don't need to run this code block.
-  let fromAccountId: string = event.params.from.toString();
+  let fromAccountId: string = event.params.from.toHexString();
   if (fromAccountId != fyTokenId) {
     let account: Account | null = Account.load(fromAccountId);
     if (account == null) {
@@ -194,7 +194,7 @@ export function handleTransfer(event: Transfer): void {
   // someone accidentally sends fTokens to a fyToken contract. This will not
   // get recorded. Right now it would be messy to include, so we are leaving
   // it out for now.
-  let toAccountId: string = event.params.to.toString();
+  let toAccountId: string = event.params.to.toHexString();
   if (toAccountId != fyTokenId) {
     loadOrCreateAccount(toAccountId);
 

@@ -10,7 +10,7 @@ import {
 } from "../helpers/database";
 
 export function handleRedeemFyTokens(event: RedeemFyTokens): void {
-  let accountId: string = event.params.account.toString();
+  let accountId: string = event.params.account.toHexString();
   let fyTokenAmount: BigDecimal = event.params.fyTokenAmount.toBigDecimal();
 
   let account: Account | null = Account.load(accountId);
@@ -19,7 +19,7 @@ export function handleRedeemFyTokens(event: RedeemFyTokens): void {
     return;
   }
 
-  let redemptionPoolId: string = event.address.toString();
+  let redemptionPoolId: string = event.address.toHexString();
   let redemptionPool: RedemptionPool | null = RedemptionPool.load(redemptionPoolId);
   if (redemptionPool == null) {
     log.error("RedemptionPool entity expected to exist when {} redeemed fyTokens", [accountId]);
@@ -42,12 +42,12 @@ export function handleRedeemFyTokens(event: RedeemFyTokens): void {
 }
 
 export function handleSupplyUnderlying(event: SupplyUnderlying): void {
-  let accountId: string = event.params.account.toString();
+  let accountId: string = event.params.account.toHexString();
   let underlyingAmount: BigDecimal = event.params.underlyingAmount.toBigDecimal();
 
   loadOrCreateAccount(accountId);
 
-  let redemptionPoolId: string = event.address.toString();
+  let redemptionPoolId: string = event.address.toHexString();
   let redemptionPool: RedemptionPool | null = RedemptionPool.load(redemptionPoolId);
   if (redemptionPool == null) {
     log.error("RedemptionPool entity expected to exist when {} supplied underlying", [accountId]);
