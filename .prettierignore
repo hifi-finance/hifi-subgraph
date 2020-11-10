@@ -1,4 +1,4 @@
 # folders
 build/
-dist/
 node_modules/
+src/types/
