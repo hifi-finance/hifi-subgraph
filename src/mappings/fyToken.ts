@@ -163,6 +163,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   repayBorrowEvent.fyTokenSymbol = fyToken.symbol;
   repayBorrowEvent.newDebt = event.params.newDebt.toBigDecimal();
   repayBorrowEvent.timestamp = event.block.timestamp.toI32();
+  repayBorrowEvent.to = Address.fromString(fyTokenId);
   repayBorrowEvent.save();
 }
 
