@@ -1,0 +1,40 @@
+name: "Continuous Deployment"
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  ci:
+    runs-on: "ubuntu-18.04"
+    steps:
+      - name: "Check out the repo"
+        uses: "actions/checkout@v2"
+
+      - name: "Install Node.js"
+        uses: "actions/setup-node@v1"
+        with:
+          node-version: "12"
+
+      - uses: "actions/cache@v2"
+        with:
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          path: "./node_modules"
+
+      - name: "Install dependencies"
+        run: "yarn install --frozen-lockfile"
+
+      - name: "Authenticate The Graph CLI"
+        run: yarn graph auth https://api.thegraph.com/deploy/ ${{ secrets.THE_GRAPH_TOKEN }}
+
+      - name: "Lint AssemblyScript code"
+        run: "yarn run lint"
+
+      - name: "Generate AssemblyScript types"
+        run: |
+          yarn run prepare:mainnet
+          yarn run codegen
+
+      - name: "Deploy to Ropsten"
+        run: "yarn run deploy:ropsten"
