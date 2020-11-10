@@ -41,10 +41,11 @@ export function handleBorrow(event: Borrow): void {
   let borrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let borrowEvent: BorrowEvent = new BorrowEvent(borrowEventId);
   borrowEvent.amount = borrowAmount;
-  borrowEvent.borrower = event.params.account;
   borrowEvent.blockNumber = event.block.number.toI32();
+  borrowEvent.from = Address.fromString(fyTokenId);
   borrowEvent.fyTokenSymbol = fyToken.symbol;
   borrowEvent.timestamp = event.block.timestamp.toI32();
+  borrowEvent.to = Address.fromString(borrowerId);
   borrowEvent.save();
 }
 
@@ -98,13 +99,14 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let liquidateBorrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let liquidateBorrowEvent = new LiquidateBorrowEvent(liquidateBorrowEventId);
   liquidateBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
+  liquidateBorrowEvent.borrower = Address.fromString(borrowerId);
   liquidateBorrowEvent.blockNumber = event.block.number.toI32();
   liquidateBorrowEvent.collateralSymbol = collateral.symbol;
   liquidateBorrowEvent.clutchedCollateralAmount = event.params.clutchedCollateralAmount.toBigDecimal();
-  liquidateBorrowEvent.from = event.params.borrower;
+  liquidateBorrowEvent.from = Address.fromString(liquidatorId);
   liquidateBorrowEvent.fyTokenSymbol = fyToken.symbol;
   liquidateBorrowEvent.timestamp = event.block.timestamp.toI32();
-  liquidateBorrowEvent.to = event.params.liquidator;
+  liquidateBorrowEvent.to = Address.fromString(fyTokenId);
   liquidateBorrowEvent.save();
 }
 
@@ -156,10 +158,10 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let repayBorrowEvent: RepayBorrowEvent = new RepayBorrowEvent(repayBorrowEventId);
   repayBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
   repayBorrowEvent.blockNumber = event.block.number.toI32();
-  repayBorrowEvent.borrower = event.params.borrower;
+  repayBorrowEvent.borrower = Address.fromString(borrowerId);
+  repayBorrowEvent.from = Address.fromString(event.params.payer);
   repayBorrowEvent.fyTokenSymbol = fyToken.symbol;
   repayBorrowEvent.newDebt = event.params.newDebt.toBigDecimal();
-  repayBorrowEvent.payer = event.params.payer;
   repayBorrowEvent.timestamp = event.block.timestamp.toI32();
   repayBorrowEvent.save();
 }

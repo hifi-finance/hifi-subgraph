@@ -1,9 +1,9 @@
-### GENERIC TYPES ***
+### INTERFACES ###
 
 """
-Generic type for Erc20 tokens.
+Generic interface for Erc20 fyTokens.
 """
-type Token @entity {
+interface Erc20 {
   "Contract address"
   id: ID!
   "Erc20 decimals"
@@ -15,9 +15,29 @@ type Token @entity {
 }
 
 """
-Generic type for Ethereum transactions.
+Generic interface for FyToken token transfers.
 """
-type Transaction @entity {
+interface FyTokenTransfer @entity {
+  "Transaction hash concatenated with log index"
+  id: ID!
+  "fyTokens transferred"
+  amount: BigDecimal!
+  "Block number"
+  blockNumber: Int!
+  "Account that sent fyTokens"
+  from: Bytes!
+  "Symbol of the fyTokens transferred"
+  fyTokenSymbol: String!
+  "Block timestamp"
+  timestamp: Int!
+  "Account that received fyTokens"
+  to: Bytes!
+}
+
+"""
+Generic interface for Ethereum transactions.
+"""
+interface Transaction {
   "Transaction hash concatenated with the log index"
   id: ID!
   "Block number"
@@ -28,6 +48,22 @@ type Transaction @entity {
   timestamp: Int!
   "Transaction hash"
   txHash: Bytes!
+}
+
+### GENERIC TYPES ###
+
+"""
+Generic type for Erc20 fyTokens.
+"""
+type Token implements Erc20 @entity {
+  "Contract address"
+  id: ID!
+  "Erc20 decimals"
+  decimals: Int!
+  "Erc20 name"
+  name: String!
+  "Erc20 symbol"
+  symbol: String!
 }
 
 ### PROTOCOL TYPES ***
@@ -110,7 +146,7 @@ type Fintroller @entity {
 """
 Stores high-level variables for a fyToken.
 """
-type FyToken implements Token @entity {
+type FyToken implements Erc20 @entity {
   "Contract address"
   id: ID!
   "One-to-one relation to collateral"
@@ -174,38 +210,40 @@ type Vault @entity {
 """
 Stores information for borrows.
 """
-type BorrowEvent implements TransferEvent @entity {
+type BorrowEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "Amount of fyTokens borrowed"
   amount: BigDecimal!
-  "Account that borrowed the fyTokens"
-  borrower: Bytes!
   "Block number"
   blockNumber: Int!
+  "Account that sent fyTokens (FyToken contract)"
+  from: Bytes!
   "Symbol of the borrowed fyToken"
   fyTokenSymbol: String!
   "Block timestamp"
   timestamp: Int!
+  "Account that borrowed the fyTokens"
+  to: Bytes!
 }
 
 """
 Stores information for burns. `To` address will always be a fyToken.
 """
-type BurnEvent implements TransferEvent @entity {
+type BurnEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "fyTokens transferred"
   amount: BigDecimal!
   "Block number"
   blockNumber: Int!
-  "Account that burnt tokens"
+  "Account that burnt fyTokens"
   from: Bytes!
   "Symbol of the fyToken transferred"
   fyTokenSymbol: String!
   "Block timestamp"
   timestamp: Int!
-  "Account that received tokens (FyToken contract)"
+  "Account that received fyTokens (FyToken contract)"
   to: Bytes!
 }
 
@@ -214,64 +252,66 @@ Will be stored for every mint, burn, borrow, repay borrow, liquidate borrow,
 and any normal transfer between two accounts. MintEvent, BurnEvent, BorrowEvent,
 RepayBorrowEvent and LiquidationEvent all implement this type.
 """
-type TransferEvent @entity {
+type FyTokenTransferEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "fyTokens transferred"
   amount: BigDecimal!
   "Block number"
   blockNumber: Int!
-  "Account that sent tokens"
+  "Account that sent fyTokens"
   from: Bytes!
   "Symbol of the fyToken transferred"
   fyTokenSymbol: String!
   "Block timestamp"
   timestamp: Int!
-  "Account that received tokens"
+  "Account that received fyTokens"
   to: Bytes!
 }
 
 """
 Stores information for liquidations. The event is emitted from the fyToken.
 """
-type LiquidateBorrowEvent implements TransferEvent @entity {
+type LiquidateBorrowEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "Amount of fyTokens repaid by liquidator"
   amount: BigDecimal!
   "Block number"
   blockNumber: Int!
+  "Account liquidated (borrower)"
+  borrower: Bytes!
   "Collateral seized"
   clutchedCollateralAmount: BigDecimal!
   "Erc20 symbol of collateral clutched by liquidator"
   collateralSymbol: String!
-  "Account liquidated (borrower)"
+  "Liquidator"
   from: Bytes!
   "Symbol of the fyToken repaid through liquidation"
   fyTokenSymbol: String!
   "Block timestamp"
   timestamp: Int!
-  "Liquidator receiving tokens"
+  "Account that received fyTokens (FyToken contract)"
   to: Bytes!
 }
 
 """
 Stores information for mints. `From` address will always be a fyToken.
 """
-type MintEvent implements TransferEvent @entity {
+type MintEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "fyTokens transferred"
   amount: BigDecimal!
   "Block number"
   blockNumber: Int!
-  "Account that sent tokens (FyToken contract)"
+  "Account that sent fyTokens (FyToken contract)"
   from: Bytes!
   "Symbol of the fyToken transferred"
   fyTokenSymbol: String!
   "Block timestamp"
   timestamp: Int!
-  "Account that received tokens (minter)"
+  "Account that received fyTokens (minter)"
   to: Bytes!
 }
 
@@ -279,21 +319,23 @@ type MintEvent implements TransferEvent @entity {
 Stores information for repays. Payer is not always the same as borrower,
 such as in the event of a liquidation.
 """
-type RepayBorrowEvent implements TransferEvent @entity {
+type RepayBorrowEvent implements FyTokenTransfer @entity {
   "Transaction hash concatenated with log index"
   id: ID!
   "Amount of fyTokens repaid"
   amount: BigDecimal!
+  "Account that borrowed the fyTokens"
+  borrower: Bytes!
   "Block number"
   blockNumber: Int!
-  "Account that borrowed the tokens"
-  borrower: Bytes!
+  "Payer of the borrowed funds"
+  from: Bytes!
   "Symbol of the fyToken transferred"
   fyTokenSymbol: String!
   "Debt still owed by the borrower"
   newDebt: BigDecimal!
-  "Payer of the borrowed funds"
-  payer: Bytes!
   "Block timestamp"
   timestamp: Int!
+  "Account that received fyTokens (FyToken contract)"
+  to: Bytes!
 }
