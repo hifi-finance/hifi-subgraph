@@ -50,6 +50,8 @@ dataSources:
       file: ./src/mappings/fintroller.ts
       language: wasm/assemblyscript
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: Fintroller
           file: ./abis/Fintroller.json
         - name: FyToken
