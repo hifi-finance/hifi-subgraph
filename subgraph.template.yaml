@@ -52,6 +52,10 @@ dataSources:
       abis:
         - name: Fintroller
           file: ./abis/Fintroller.json
+        - name: FyToken
+          file: ./abis/FyToken.json
+        - name: RedemptionPool
+          file: ./abis/RedemptionPool.json
       entities:
         - Fintroller
         - FyToken
