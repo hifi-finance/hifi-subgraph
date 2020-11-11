@@ -97,6 +97,7 @@ templates:
         - LiquidateBorrowEvent
         - MintEvent
         - RepayBorrowEvent
+        - Token
       eventHandlers:
         - event: Borrow(indexed address,uint256)
           handler: handleBorrow

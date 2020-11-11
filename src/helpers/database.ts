@@ -25,7 +25,7 @@ export function getAccountFyTokenTransactionId(accountId: string, txHash: Bytes,
 }
 
 export function getEventId(txHash: Bytes, logIndex: BigInt): string {
-  return txHash.concat("-").concat(logIndex);
+  return txHash.toHexString().concat("-").concat(logIndex.toString());
 }
 
 export function getVaultId(fyTokenId: string, accountId: string): string {
