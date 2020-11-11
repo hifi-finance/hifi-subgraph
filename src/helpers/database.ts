@@ -45,6 +45,11 @@ export function createAccountFyToken(fyTokenId: string, accountId: string): Acco
   let accountFyToken: AccountFyToken = new AccountFyToken(id);
   accountFyToken.account = accountId;
   accountFyToken.fyToken = fyTokenId;
+  accountFyToken.fyTokenBalance = zeroBd;
+  accountFyToken.totalFyTokenBorrowed = zeroBd;
+  accountFyToken.totalFyTokenRedeemed = zeroBd;
+  accountFyToken.totalFyTokenRepaid = zeroBd;
+  accountFyToken.totalUnderlyingSupplied = zeroBd;
   accountFyToken.vault = id;
   accountFyToken.save();
   return accountFyToken;

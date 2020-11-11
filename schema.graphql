@@ -106,7 +106,7 @@ type AccountFyToken @entity {
   "Total amount of underlying supplied"
   totalUnderlyingSupplied: BigDecimal!
   "Transactions data"
-  transactions: [AccountFyTokenTransaction!]! @derivedFrom(field: "accountFyToken")
+  transactions: [AccountFyTokenTransaction!] @derivedFrom(field: "accountFyToken")
   "One-to-one relation to Vault"
   vault: Vault!
 }
