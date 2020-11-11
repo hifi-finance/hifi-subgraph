@@ -80,7 +80,7 @@ templates:
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
-      file: ./src/mappings/fintroller.ts
+      file: ./src/mappings/fyToken.ts
       language: wasm/assemblyscript
       abis:
         - name: Erc20
@@ -93,10 +93,10 @@ templates:
         - AccountFyTokenTransaction
         - BorrowEvent
         - BurnEvent
-        - LiquidateEvent
+        - FyTokenTransferEvent
+        - LiquidateBorrowEvent
         - MintEvent
         - RepayBorrowEvent
-        - TransferEvent
       eventHandlers:
         - event: Borrow(indexed address,uint256)
           handler: handleBorrow
