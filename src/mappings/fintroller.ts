@@ -1,11 +1,16 @@
 import { log } from "@graphprotocol/graph-ts";
 
-import { ListBond, SetDebtCeiling, SetLiquidationIncentive, SetOracle } from "../types/Fintroller/Fintroller";
+import {
+  ListBond as ListBondEvent,
+  SetDebtCeiling as SetDebtCeilingEvent,
+  SetLiquidationIncentive as SetLiquidationIncentiveEvent,
+  SetOracle as SetOracleEvent,
+} from "../types/Fintroller/Fintroller";
 import { Fintroller, FyToken } from "../types/schema";
 import { createFyToken, createRedemptionPool, loadOrCreateFintroller } from "../helpers/database";
 import { fyTokenDecimalsBd } from "../helpers/constants";
 
-export function handleListBond(event: ListBond): void {
+export function handleListBond(event: ListBondEvent): void {
   loadOrCreateFintroller();
 
   // Create the FyToken entity.
@@ -22,7 +27,7 @@ export function handleListBond(event: ListBond): void {
   createRedemptionPool(redemptionPoolId, fyTokenId);
 }
 
-export function handleSetDebtCeiling(event: SetDebtCeiling): void {
+export function handleSetDebtCeiling(event: SetDebtCeilingEvent): void {
   loadOrCreateFintroller();
 
   let fyTokenId: string = event.params.fyToken.toHexString();
@@ -35,13 +40,13 @@ export function handleSetDebtCeiling(event: SetDebtCeiling): void {
   fyToken.save();
 }
 
-export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {
+export function handleSetLiquidationIncentive(event: SetLiquidationIncentiveEvent): void {
   let fintroller: Fintroller = loadOrCreateFintroller();
   fintroller.liquidationIncentiveMantissa = event.params.newLiquidationIncentive;
   fintroller.save();
 }
 
-export function handleSetOracle(event: SetOracle): void {
+export function handleSetOracle(event: SetOracleEvent): void {
   let fintroller: Fintroller = loadOrCreateFintroller();
   fintroller.oracle = event.params.newOracle;
   fintroller.save();

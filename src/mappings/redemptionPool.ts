@@ -1,7 +1,10 @@
 import { BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import { Account, AccountFyToken, FyToken, RedemptionPool, Token } from "../types/schema";
-import { RedeemFyTokens, SupplyUnderlying } from "../types/templates/RedemptionPool/RedemptionPool";
+import {
+  RedeemFyTokens as RedeemFyTokensEvent,
+  SupplyUnderlying as SupplyUnderlyingEvent,
+} from "../types/templates/RedemptionPool/RedemptionPool";
 import {
   createAccountFyTokenTransaction,
   getAccountFyTokenId,
@@ -11,7 +14,7 @@ import {
 import { fyTokenDecimalsBd } from "../helpers/constants";
 import { scaleTokenAmount } from "../helpers/math";
 
-export function handleRedeemFyTokens(event: RedeemFyTokens): void {
+export function handleRedeemFyTokens(event: RedeemFyTokensEvent): void {
   let accountId: string = event.params.account.toHexString();
   let account: Account | null = Account.load(accountId);
   if (account == null) {
@@ -54,7 +57,7 @@ export function handleRedeemFyTokens(event: RedeemFyTokens): void {
   createAccountFyTokenTransaction(fyTokenId, accountId, event);
 }
 
-export function handleSupplyUnderlying(event: SupplyUnderlying): void {
+export function handleSupplyUnderlying(event: SupplyUnderlyingEvent): void {
   let accountId: string = event.params.account.toHexString();
   loadOrCreateAccount(accountId);
 

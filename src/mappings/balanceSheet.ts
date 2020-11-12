@@ -1,20 +1,20 @@
 import { BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import {
-  ClutchCollateral,
-  DepositCollateral,
-  FreeCollateral,
-  LockCollateral,
-  OpenVault,
-  SetVaultDebt,
-  WithdrawCollateral,
+  ClutchCollateral as ClutchCollateralEvent,
+  DepositCollateral as DepositCollateralEvent,
+  FreeCollateral as FreeCollateralEvent,
+  LockCollateral as LockCollateralEvent,
+  OpenVault as OpenVaultEvent,
+  SetVaultDebt as SetVaultDebtEvent,
+  WithdrawCollateral as WithdrawCollateralEvent,
 } from "../types/BalanceSheet/BalanceSheet";
 import { FyToken, Token, Vault } from "../types/schema";
 import { createVault, getAccountFyTokenId, loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
 import { fyTokenDecimalsBd } from "../helpers/constants";
 import { scaleTokenAmount } from "../helpers/math";
 
-export function handleClutchCollateral(event: ClutchCollateral): void {
+export function handleClutchCollateral(event: ClutchCollateralEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let borrowerId: string = event.params.borrower.toHexString();
 
@@ -36,7 +36,7 @@ export function handleClutchCollateral(event: ClutchCollateral): void {
   vault.save();
 }
 
-export function handleDepositCollateral(event: DepositCollateral): void {
+export function handleDepositCollateral(event: DepositCollateralEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let accountId: string = event.params.account.toHexString();
 
@@ -55,7 +55,7 @@ export function handleDepositCollateral(event: DepositCollateral): void {
   vault.save();
 }
 
-export function handleFreeCollateral(event: FreeCollateral): void {
+export function handleFreeCollateral(event: FreeCollateralEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let accountId: string = event.params.account.toHexString();
 
@@ -75,7 +75,7 @@ export function handleFreeCollateral(event: FreeCollateral): void {
   vault.save();
 }
 
-export function handleLockCollateral(event: LockCollateral): void {
+export function handleLockCollateral(event: LockCollateralEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let accountId: string = event.params.account.toHexString();
 
@@ -95,7 +95,7 @@ export function handleLockCollateral(event: LockCollateral): void {
   vault.save();
 }
 
-export function handleOpenVault(event: OpenVault): void {
+export function handleOpenVault(event: OpenVaultEvent): void {
   loadOrCreateFintroller();
 
   let fyTokenId: string = event.params.fyToken.toHexString();
@@ -111,7 +111,7 @@ export function handleOpenVault(event: OpenVault): void {
   createVault(fyTokenId, accountId);
 }
 
-export function handleSetVaultDebt(event: SetVaultDebt): void {
+export function handleSetVaultDebt(event: SetVaultDebtEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let accountId: string = event.params.account.toHexString();
 
@@ -127,7 +127,7 @@ export function handleSetVaultDebt(event: SetVaultDebt): void {
   vault.save();
 }
 
-export function handleWithdrawCollateral(event: WithdrawCollateral): void {
+export function handleWithdrawCollateral(event: WithdrawCollateralEvent): void {
   let fyTokenId: string = event.params.fyToken.toHexString();
   let accountId: string = event.params.account.toHexString();
 
