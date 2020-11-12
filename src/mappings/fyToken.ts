@@ -20,6 +20,7 @@ import {
   loadOrCreateAccount,
   loadOrCreateAccountFyToken,
 } from "../helpers/database";
+import { fyTokenDecimalsBd } from "../helpers/constants";
 
 export function handleBorrow(event: Borrow): void {
   let borrowerId: string = event.params.account.toHexString();
@@ -187,7 +188,9 @@ export function handleTransfer(event: Transfer): void {
       log.error("AccountFyToken entity expected to exist when {} transferred {} tokens", [fromAccountId, fyTokenId]);
       return;
     }
-    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.minus(event.params.value.toBigDecimal());
+    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.minus(
+      event.params.value.toBigDecimal().div(fyTokenDecimalsBd),
+    );
     accountFyToken.save();
 
     createAccountFyTokenTransaction(fyTokenId, fromAccountId, event);
@@ -203,7 +206,9 @@ export function handleTransfer(event: Transfer): void {
     loadOrCreateAccount(toAccountId);
 
     let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, toAccountId);
-    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.plus(event.params.value.toBigDecimal());
+    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.plus(
+      event.params.value.toBigDecimal().div(fyTokenDecimalsBd),
+    );
     accountFyToken.save();
 
     createAccountFyTokenTransaction(fyTokenId, toAccountId, event);
