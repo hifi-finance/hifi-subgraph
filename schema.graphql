@@ -103,6 +103,8 @@ type AccountFyToken @entity {
   totalFyTokenRedeemed: BigDecimal!
   "Total amount of fyTokens repaid"
   totalFyTokenRepaid: BigDecimal!
+  "Total amount of underlying redeemed"
+  totalUnderlyingRedeemed: BigDecimal!
   "Total amount of underlying supplied"
   totalUnderlyingSupplied: BigDecimal!
   "Transactions data"
@@ -138,7 +140,7 @@ type Fintroller @entity {
   "One-to-many relation to FyToken"
   fyTokens: [FyToken!] @derivedFrom(field: "fintroller")
   "Discount on collateral that liquidators receive"
-  liquidationIncentiveMantissa: BigDecimal!
+  liquidationIncentiveMantissa: BigInt!
   "Price oracle"
   oracle: Bytes!
 }

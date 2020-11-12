@@ -13,6 +13,7 @@ import {
   Token,
 } from "../types/schema";
 import { Borrow, Burn, LiquidateBorrow, Mint, RepayBorrow, Transfer } from "../types/templates/FyToken/FyToken";
+import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import {
   createAccountFyTokenTransaction,
   getAccountFyTokenId,
@@ -21,16 +22,18 @@ import {
   loadOrCreateAccountFyToken,
 } from "../helpers/database";
 import { fyTokenDecimalsBd } from "../helpers/constants";
+import { scaleTokenAmount } from "../helpers/math";
 
 export function handleBorrow(event: Borrow): void {
   let borrowerId: string = event.params.account.toHexString();
-  let borrowAmount: BigDecimal = event.params.repayAmount.toBigDecimal(); // TODO: fix this typo in Solidity
+  // TODO: fix this typo in Solidity
+  let borrowAmountBd: BigDecimal = event.params.repayAmount.toBigDecimal().div(fyTokenDecimalsBd);
 
   loadOrCreateAccount(borrowerId);
 
   let fyTokenId: string = event.address.toHexString();
   let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, borrowerId);
-  accountFyToken.totalFyTokenBorrowed = accountFyToken.totalFyTokenBorrowed.plus(borrowAmount);
+  accountFyToken.totalFyTokenBorrowed = accountFyToken.totalFyTokenBorrowed.plus(borrowAmountBd);
   accountFyToken.save();
 
   createAccountFyTokenTransaction(fyTokenId, borrowerId, event);
@@ -42,7 +45,7 @@ export function handleBorrow(event: Borrow): void {
   // Create the BorrowEvent entity.
   let borrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let borrowEvent: BorrowEvent = new BorrowEvent(borrowEventId);
-  borrowEvent.amount = borrowAmount;
+  borrowEvent.amount = borrowAmountBd;
   borrowEvent.blockNumber = event.block.number.toI32();
   borrowEvent.from = Address.fromString(fyTokenId);
   borrowEvent.fyTokenSymbol = fyToken.symbol;
@@ -60,7 +63,7 @@ export function handleBurn(event: Burn): void {
   // Create the BurnEvent entity.
   let burnEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let burnEvent: BurnEvent = new BurnEvent(burnEventId);
-  burnEvent.amount = event.params.burnAmount.toBigDecimal();
+  burnEvent.amount = event.params.burnAmount.toBigDecimal().div(fyTokenDecimalsBd);
   burnEvent.blockNumber = event.block.number.toI32();
   burnEvent.from = event.params.account;
   burnEvent.fyTokenSymbol = fyToken.symbol;
@@ -95,16 +98,21 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   // have to be listed in the Fintroller before a liquidate borrow can occur.
   let fyTokenId: string = event.address.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateral: Token | null = Token.load(fyToken.collateral);
+  let collateralId: string = fyToken.collateral;
+  let collateral: Token | null = Token.load(collateralId);
+  let clutchedCollateralAmountBd: BigDecimal = scaleTokenAmount(
+    event.params.clutchedCollateralAmount,
+    collateral.decimals,
+  );
 
   // Create the LiquidateBorrowEvent entity.
   let liquidateBorrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let liquidateBorrowEvent = new LiquidateBorrowEvent(liquidateBorrowEventId);
-  liquidateBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
+  liquidateBorrowEvent.amount = event.params.repayAmount.toBigDecimal().div(fyTokenDecimalsBd);
   liquidateBorrowEvent.borrower = Address.fromString(borrowerId);
   liquidateBorrowEvent.blockNumber = event.block.number.toI32();
   liquidateBorrowEvent.collateralSymbol = collateral.symbol;
-  liquidateBorrowEvent.clutchedCollateralAmount = event.params.clutchedCollateralAmount.toBigDecimal();
+  liquidateBorrowEvent.clutchedCollateralAmount = clutchedCollateralAmountBd;
   liquidateBorrowEvent.from = Address.fromString(liquidatorId);
   liquidateBorrowEvent.fyTokenSymbol = fyToken.symbol;
   liquidateBorrowEvent.timestamp = event.block.timestamp.toI32();
@@ -121,7 +129,7 @@ export function handleMint(event: Mint): void {
   // Create the MintEvent entity.
   let mintEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let mintEvent: MintEvent = new MintEvent(mintEventId);
-  mintEvent.amount = event.params.mintAmount.toBigDecimal();
+  mintEvent.amount = event.params.mintAmount.toBigDecimal().div(fyTokenDecimalsBd);
   mintEvent.blockNumber = event.block.number.toI32();
   mintEvent.from = Address.fromString(fyTokenId);
   mintEvent.fyTokenSymbol = fyToken.symbol;
@@ -145,7 +153,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     log.error("AccountFyToken entity expected to exist when repaying borrow for {}", [accountFyTokenId]);
     return;
   }
-  let repayAmount: BigDecimal = event.params.repayAmount.toBigDecimal();
+  let repayAmount: BigDecimal = event.params.repayAmount.toBigDecimal().div(fyTokenDecimalsBd);
   accountFyToken.totalFyTokenRepaid = accountFyToken.totalFyTokenRepaid.plus(repayAmount);
   accountFyToken.save();
 
@@ -158,12 +166,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   // Create the RepayBorrowEvent entity.
   let repayBorrowEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let repayBorrowEvent: RepayBorrowEvent = new RepayBorrowEvent(repayBorrowEventId);
-  repayBorrowEvent.amount = event.params.repayAmount.toBigDecimal();
+  repayBorrowEvent.amount = event.params.repayAmount.toBigDecimal().div(fyTokenDecimalsBd);
   repayBorrowEvent.blockNumber = event.block.number.toI32();
   repayBorrowEvent.borrower = Address.fromString(borrowerId);
   repayBorrowEvent.from = event.params.payer;
   repayBorrowEvent.fyTokenSymbol = fyToken.symbol;
-  repayBorrowEvent.newDebt = event.params.newDebt.toBigDecimal();
+  repayBorrowEvent.newDebt = event.params.newDebt.toBigDecimal().div(fyTokenDecimalsBd);
   repayBorrowEvent.timestamp = event.block.timestamp.toI32();
   repayBorrowEvent.to = Address.fromString(fyTokenId);
   repayBorrowEvent.save();
@@ -171,6 +179,15 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
 export function handleTransfer(event: Transfer): void {
   let fyTokenId: string = event.address.toHexString();
+
+  // We can assume that the FyToken entity exists since bonds have to be
+  // listed in the Fintroller before a repay borrow can occur.
+  let fyToken: FyToken | null = FyToken.load(fyTokenId);
+
+  // We have to load the fyToken contract and read its state because the
+  // total supply could have either increased or decreased.
+  let fyTokenContract: FyTokenContract = FyTokenContract.bind(Address.fromString(fyTokenId));
+  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal().div(fyTokenDecimalsBd);
 
   // Check if the tx is FROM the fyToken contract itself. If so, it is a mint
   // and we don't need to run this code block.
@@ -188,9 +205,9 @@ export function handleTransfer(event: Transfer): void {
       log.error("AccountFyToken entity expected to exist when {} transferred {} tokens", [fromAccountId, fyTokenId]);
       return;
     }
-    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.minus(
-      event.params.value.toBigDecimal().div(fyTokenDecimalsBd),
-    );
+
+    let fyTokenAmount: BigDecimal = event.params.value.toBigDecimal().div(fyTokenDecimalsBd);
+    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.minus(fyTokenAmount);
     accountFyToken.save();
 
     createAccountFyTokenTransaction(fyTokenId, fromAccountId, event);
@@ -206,22 +223,17 @@ export function handleTransfer(event: Transfer): void {
     loadOrCreateAccount(toAccountId);
 
     let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, toAccountId);
-    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.plus(
-      event.params.value.toBigDecimal().div(fyTokenDecimalsBd),
-    );
+    let fyTokenAmount: BigDecimal = event.params.value.toBigDecimal().div(fyTokenDecimalsBd);
+    accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.plus(fyTokenAmount);
     accountFyToken.save();
 
     createAccountFyTokenTransaction(fyTokenId, toAccountId, event);
   }
 
-  // We can assume that the FyToken entity exists since bonds have to be
-  // listed in the Fintroller before a repay borrow can occur.
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-
   // Create the FyTokenTransferEvent entity.
   let fyTokenTransferEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let fyTokenTransferEvent = new FyTokenTransferEvent(fyTokenTransferEventId);
-  fyTokenTransferEvent.amount = event.params.value.toBigDecimal();
+  fyTokenTransferEvent.amount = event.params.value.toBigDecimal().div(fyTokenDecimalsBd);
   fyTokenTransferEvent.from = event.params.from;
   fyTokenTransferEvent.blockNumber = event.block.number.toI32();
   fyTokenTransferEvent.fyTokenSymbol = fyToken.symbol;

@@ -14,7 +14,7 @@ import { Erc20 as Erc20Contract } from "../types/templates/FyToken/Erc20";
 import { Fintroller as FintrollerContract } from "../types/Fintroller/Fintroller";
 import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import { FyToken as FyTokenTemplate } from "../types/templates";
-import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, zeroBd } from "./constants";
+import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, fyTokenDecimalsBd, zeroBd } from "./constants";
 
 export function getAccountFyTokenId(fyTokenId: string, accountId: string): string {
   return fyTokenId.concat("-").concat(accountId);
@@ -86,46 +86,34 @@ export function createFintroller(): Fintroller {
 
 export function createFyToken(id: string): FyToken {
   // Create the tracked contract based on the template.
-  let fyTokenId: Address = Address.fromString(id);
-  FyTokenTemplate.create(fyTokenId);
+  let fyTokenAddress: Address = Address.fromString(id);
+  FyTokenTemplate.create(fyTokenAddress);
 
-  // Load the FyToken contract and it variables.
-  let fyTokenContract: FyTokenContract = FyTokenContract.bind(fyTokenId);
-  let collateralAddress: string = fyTokenContract.collateral().toHexString();
+  // Bind the FyToken contract and read its state.
+  let fyTokenContract: FyTokenContract = FyTokenContract.bind(fyTokenAddress);
+  let collateralId: string = fyTokenContract.collateral().toHexString();
   let fintrollerAddress: string = fyTokenContract.fintroller().toHexString();
-  let underlyingAddress: string = fyTokenContract.underlying().toHexString();
+  let underlyingId: string = fyTokenContract.underlying().toHexString();
 
-  // Load the Fintroller contract.
+  // Bind the Fintroller contract.
   let fintrollerContract: FintrollerContract = FintrollerContract.bind(Address.fromString(fintrollerAddress));
 
-  // Load the collateral contract.
-  let collateralContract: Erc20Contract = Erc20Contract.bind(Address.fromString(collateralAddress));
-  let collateral: Token = new Token(collateralAddress);
-  collateral.decimals = collateralContract.decimals();
-  collateral.name = collateralContract.name();
-  collateral.symbol = collateralContract.symbol();
-  collateral.save();
-
-  // Load the underlying contract.
-  let underlyingContract: Erc20Contract = Erc20Contract.bind(Address.fromString(underlyingAddress));
-  let underlying: Token = new Token(underlyingAddress);
-  underlying.decimals = underlyingContract.decimals();
-  underlying.name = underlyingContract.name();
-  underlying.symbol = underlyingContract.symbol();
-  underlying.save();
+  // Create the token entities.
+  createToken(collateralId);
+  createToken(underlyingId);
 
   // Create the FyToken entity.
-  let fyToken: FyToken = new FyToken(id);
-  fyToken.collateral = collateralAddress;
+  let fyToken: FyToken = new FyToken(fyTokenAddress.toHexString());
+  fyToken.collateral = collateralId;
   fyToken.decimals = fyTokenContract.decimals();
-  fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenId).toBigDecimal();
+  fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenAddress).toBigDecimal().div(fyTokenDecimalsBd);
   fyToken.expirationTime = fyTokenContract.expirationTime().toI32();
   fyToken.fintroller = fintrollerDefaultId;
   fyToken.name = fyTokenContract.name();
   fyToken.redemptionPool = fyTokenContract.redemptionPool().toHexString();
   fyToken.symbol = fyTokenContract.symbol();
-  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal();
-  fyToken.underlying = underlyingAddress;
+  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal().div(fyTokenDecimalsBd);
+  fyToken.underlying = underlyingId;
   fyToken.save();
 
   return fyToken;
@@ -136,6 +124,16 @@ export function createRedemptionPool(id: string, fyTokenId: string): RedemptionP
   redemptionPool.fyToken = fyTokenId;
   redemptionPool.totalUnderlyingSupply = zeroBd;
   return redemptionPool;
+}
+
+export function createToken(id: string): Token {
+  let contract: Erc20Contract = Erc20Contract.bind(Address.fromString(id));
+  let token: Token = new Token(id);
+  token.decimals = contract.decimals();
+  token.name = contract.name();
+  token.symbol = contract.symbol();
+  token.save();
+  return token;
 }
 
 export function createVault(fyTokenId: string, accountId: string): Vault {
@@ -183,4 +181,12 @@ export function loadOrCreateFyToken(id: string): FyToken {
     fyToken = createFyToken(id);
   }
   return fyToken as FyToken;
+}
+
+export function loadOrCreateToken(id: string): Token {
+  let token: Token | null = Token.load(id);
+  if (token == null) {
+    token = createToken(id);
+  }
+  return token as Token;
 }
