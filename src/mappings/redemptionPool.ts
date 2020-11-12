@@ -34,8 +34,8 @@ export function handleRedeemFyTokens(event: RedeemFyTokens): void {
     return;
   }
 
-  // We can assume that the FyToken and the Underlying entities exist since bonds
-  // have to be listed in the Fintroller before a redeem fyTokens can occur.
+  // The FyToken and the Underlying entities exist because bonds have to be listed
+  // in the Fintroller before a redeem fyTokens can occur.
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   let underlyingId: string = fyToken.underlying;
   let underlying: Token | null = Token.load(underlyingId);
@@ -65,8 +65,8 @@ export function handleSupplyUnderlying(event: SupplyUnderlying): void {
     return;
   }
 
-  // We can assume that the underlying and fyToken entities exist since bonds
-  // have to be listed in the Fintroller before a supply underlying can occur.
+  // The underlying and fyToken entities exist because bonds have to be listed
+  // in the Fintroller before a supply underlying can occur.
   let fyTokenId: string = redemptionPool.fyToken;
   let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, accountId);
 

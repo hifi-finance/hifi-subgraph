@@ -38,8 +38,8 @@ export function handleBorrow(event: Borrow): void {
 
   createAccountFyTokenTransaction(fyTokenId, borrowerId, event);
 
-  // We can assume that the FyToken entity exists since bonds have to be
-  // listed in the Fintroller before a borrow can occur.
+  // The FyToken entity exists because bonds have to be listed in the Fintroller
+  // before a borrow can occur.
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
 
   // Create the BorrowEvent entity.
@@ -55,8 +55,8 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleBurn(event: Burn): void {
-  // We can assume that the FyToken entity exists because bonds have to
-  // be listed in the Fintroller before a burn can occur.
+  // The FyToken entity exists because bonds have to be listed in the Fintroller
+  // before a burn can occur.
   let fyTokenId: string = event.address.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
 
@@ -94,8 +94,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidatorAccount.countLiquidator = liquidatorAccount.countLiquidator + 1;
   liquidatorAccount.save();
 
-  // We can assume that the FyToken and the Collateral entity exists because bonds
-  // have to be listed in the Fintroller before a liquidate borrow can occur.
+  // The FyToken and the Collateral entities exist because bonds have to be listed
+  // in the Fintroller before a liquidate borrow can occur.
   let fyTokenId: string = event.address.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   let collateralId: string = fyToken.collateral;
@@ -121,8 +121,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 }
 
 export function handleMint(event: Mint): void {
-  // We can assume that the FyToken entity exists because bonds have to
-  // be listed in the Fintroller before a mint can occur.
+  // The FyToken entity exists because bonds have to be listed in the Fintroller
+  // before a mint can occur.
   let fyTokenId: string = event.address.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
 
@@ -159,8 +159,8 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
   createAccountFyTokenTransaction(fyTokenId, borrowerId, event);
 
-  // We can assume that the FyToken entity exists since bonds have to be
-  // listed in the Fintroller before a repay borrow can occur.
+  // The FyToken entity exists because bonds have to be listed in the Fintroller
+  // before a repay borrow can occur.
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
 
   // Create the RepayBorrowEvent entity.
@@ -180,8 +180,8 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 export function handleTransfer(event: Transfer): void {
   let fyTokenId: string = event.address.toHexString();
 
-  // We can assume that the FyToken entity exists since bonds have to be
-  // listed in the Fintroller before a repay borrow can occur.
+  // The FyToken entity exists because bonds have to be listed in the Fintroller
+  // before a repay borrow can occur.
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
 
   // We have to load the fyToken contract and read its state because the
