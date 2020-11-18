@@ -14,7 +14,7 @@ import { Erc20 as Erc20Contract } from "../types/templates/FyToken/Erc20";
 import { Fintroller as FintrollerContract } from "../types/Fintroller/Fintroller";
 import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import { FyToken as FyTokenTemplate } from "../types/templates";
-import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, fyTokenDecimalsBd, zeroBd } from "./constants";
+import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, mantissaBd, zeroBd } from "./constants";
 
 export function getAccountFyTokenId(fyTokenId: string, accountId: string): string {
   return fyTokenId.concat("-").concat(accountId);
@@ -106,13 +106,13 @@ export function createFyToken(id: string): FyToken {
   let fyToken: FyToken = new FyToken(fyTokenAddress.toHexString());
   fyToken.collateral = collateralId;
   fyToken.decimals = fyTokenContract.decimals();
-  fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenAddress).toBigDecimal().div(fyTokenDecimalsBd);
+  fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenAddress).toBigDecimal().div(mantissaBd);
   fyToken.expirationTime = fyTokenContract.expirationTime().toI32();
   fyToken.fintroller = fintrollerDefaultId;
   fyToken.name = fyTokenContract.name();
   fyToken.redemptionPool = fyTokenContract.redemptionPool().toHexString();
   fyToken.symbol = fyTokenContract.symbol();
-  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal().div(fyTokenDecimalsBd);
+  fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal().div(mantissaBd);
   fyToken.underlying = underlyingId;
   fyToken.save();
 

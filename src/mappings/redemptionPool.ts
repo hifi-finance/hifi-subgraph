@@ -11,7 +11,7 @@ import {
   loadOrCreateAccount,
   loadOrCreateAccountFyToken,
 } from "../helpers/database";
-import { fyTokenDecimalsBd } from "../helpers/constants";
+import { mantissaBd } from "../helpers/constants";
 import { scaleTokenAmount } from "../helpers/math";
 
 export function handleRedeemFyTokens(event: RedeemFyTokensEvent): void {
@@ -49,7 +49,7 @@ export function handleRedeemFyTokens(event: RedeemFyTokensEvent): void {
   redemptionPool.save();
 
   // Whereas "totalFyTokenRedeemed" and "totalUnderlyingRedeemed" are increasing monotonically.
-  let fyTokenAmountBd: BigDecimal = event.params.fyTokenAmount.toBigDecimal().div(fyTokenDecimalsBd);
+  let fyTokenAmountBd: BigDecimal = event.params.fyTokenAmount.toBigDecimal().div(mantissaBd);
   accountFyToken.totalFyTokenRedeemed = accountFyToken.totalFyTokenRedeemed.plus(fyTokenAmountBd);
   accountFyToken.totalUnderlyingRedeemed = accountFyToken.totalUnderlyingRedeemed.plus(underlyingAmountBd);
   accountFyToken.save();

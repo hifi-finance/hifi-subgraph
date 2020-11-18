@@ -11,7 +11,7 @@ import {
 } from "../types/BalanceSheet/BalanceSheet";
 import { FyToken, Token, Vault } from "../types/schema";
 import { createVault, getAccountFyTokenId, loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
-import { fyTokenDecimalsBd } from "../helpers/constants";
+import { mantissaBd } from "../helpers/constants";
 import { scaleTokenAmount } from "../helpers/math";
 
 export function handleClutchCollateral(event: ClutchCollateralEvent): void {
@@ -122,7 +122,7 @@ export function handleSetVaultDebt(event: SetVaultDebtEvent): void {
     return;
   }
 
-  let newDebtBd: BigDecimal = event.params.newDebt.toBigDecimal().div(fyTokenDecimalsBd);
+  let newDebtBd: BigDecimal = event.params.newDebt.toBigDecimal().div(mantissaBd);
   vault.debt = newDebtBd;
   vault.save();
 }

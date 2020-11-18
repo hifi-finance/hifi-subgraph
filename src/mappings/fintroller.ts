@@ -8,7 +8,7 @@ import {
 } from "../types/Fintroller/Fintroller";
 import { Fintroller, FyToken } from "../types/schema";
 import { createFyToken, createRedemptionPool, loadOrCreateFintroller } from "../helpers/database";
-import { fyTokenDecimalsBd } from "../helpers/constants";
+import { mantissaBd } from "../helpers/constants";
 
 export function handleListBond(event: ListBondEvent): void {
   loadOrCreateFintroller();
@@ -36,7 +36,7 @@ export function handleSetDebtCeiling(event: SetDebtCeilingEvent): void {
     log.error("FyToken entity expected to be exist when setting the debt ceiling: {}", [fyTokenId]);
     return;
   }
-  fyToken.debtCeiling = event.params.newDebtCeiling.toBigDecimal().div(fyTokenDecimalsBd);
+  fyToken.debtCeiling = event.params.newDebtCeiling.toBigDecimal().div(mantissaBd);
   fyToken.save();
 }
 
