@@ -49,6 +49,7 @@ export function createAccountFyToken(fyTokenId: string, accountId: string): Acco
   accountFyToken.totalFyTokenBorrowed = zeroBd;
   accountFyToken.totalFyTokenRedeemed = zeroBd;
   accountFyToken.totalFyTokenRepaid = zeroBd;
+  accountFyToken.totalUnderlyingRedeemed = zeroBd;
   accountFyToken.totalUnderlyingSupplied = zeroBd;
   accountFyToken.vault = id;
   accountFyToken.save();
