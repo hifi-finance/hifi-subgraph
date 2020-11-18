@@ -32,9 +32,10 @@ import { mantissaBd } from "../helpers/constants";
 import { scaleTokenAmount } from "../helpers/math";
 
 export function handleBorrow(event: BorrowEvent): void {
-  let borrowerId: string = event.params.account.toHexString();
-  // TODO: fix this typo in Solidity
-  let borrowAmountBd: BigDecimal = event.params.repayAmount.toBigDecimal().div(mantissaBd);
+  let borrowerId: string = event.params.borrower.toHexString();
+  let borrowAmountBd: BigDecimal = event.params.borrowAmount.toBigDecimal().div(mantissaBd);
+  log.debug("borrowAmountBd", [borrowAmountBd.toString()]);
+  log.debug("mantissaBd", [mantissaBd.toString()]);
 
   loadOrCreateAccount(borrowerId);
 
@@ -72,7 +73,7 @@ export function handleBurn(event: BurnEvent): void {
   let burnEvent: BurnEventEntity = new BurnEventEntity(burnEventId);
   burnEvent.amount = event.params.burnAmount.toBigDecimal().div(mantissaBd);
   burnEvent.blockNumber = event.block.number.toI32();
-  burnEvent.from = event.params.account;
+  burnEvent.from = event.params.holder;
   burnEvent.fyTokenSymbol = fyToken.symbol;
   burnEvent.timestamp = event.block.timestamp.toI32();
   burnEvent.to = Address.fromString(fyTokenId);
@@ -141,7 +142,7 @@ export function handleMint(event: MintEvent): void {
   mintEvent.from = Address.fromString(fyTokenId);
   mintEvent.fyTokenSymbol = fyToken.symbol;
   mintEvent.timestamp = event.block.timestamp.toI32();
-  mintEvent.to = event.params.account;
+  mintEvent.to = event.params.beneficiary;
   mintEvent.save();
 }
 
@@ -213,7 +214,7 @@ export function handleTransfer(event: TransferEvent): void {
       return;
     }
 
-    let fyTokenAmount: BigDecimal = event.params.value.toBigDecimal().div(mantissaBd);
+    let fyTokenAmount: BigDecimal = event.params.amount.toBigDecimal().div(mantissaBd);
     accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.minus(fyTokenAmount);
     accountFyToken.save();
 
@@ -230,7 +231,7 @@ export function handleTransfer(event: TransferEvent): void {
     loadOrCreateAccount(toAccountId);
 
     let accountFyToken: AccountFyToken = loadOrCreateAccountFyToken(fyTokenId, toAccountId);
-    let fyTokenAmount: BigDecimal = event.params.value.toBigDecimal().div(mantissaBd);
+    let fyTokenAmount: BigDecimal = event.params.amount.toBigDecimal().div(mantissaBd);
     accountFyToken.fyTokenBalance = accountFyToken.fyTokenBalance.plus(fyTokenAmount);
     accountFyToken.save();
 
@@ -240,7 +241,7 @@ export function handleTransfer(event: TransferEvent): void {
   // Create the FyTokenTransferEvent entity.
   let fyTokenTransferEventId: string = getEventId(event.transaction.hash, event.transactionLogIndex);
   let fyTokenTransferEvent: FyTokenTransferEventEntity = new FyTokenTransferEventEntity(fyTokenTransferEventId);
-  fyTokenTransferEvent.amount = event.params.value.toBigDecimal().div(mantissaBd);
+  fyTokenTransferEvent.amount = event.params.amount.toBigDecimal().div(mantissaBd);
   fyTokenTransferEvent.from = event.params.from;
   fyTokenTransferEvent.blockNumber = event.block.number.toI32();
   fyTokenTransferEvent.fyTokenSymbol = fyToken.symbol;

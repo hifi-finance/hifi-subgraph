@@ -2,7 +2,7 @@ import { log } from "@graphprotocol/graph-ts";
 
 import {
   ListBond as ListBondEvent,
-  SetDebtCeiling as SetDebtCeilingEvent,
+  SetBondDebtCeiling as SetBondDebtCeilingEvent,
   SetLiquidationIncentive as SetLiquidationIncentiveEvent,
   SetOracle as SetOracleEvent,
 } from "../types/Fintroller/Fintroller";
@@ -27,7 +27,7 @@ export function handleListBond(event: ListBondEvent): void {
   createRedemptionPool(redemptionPoolId, fyTokenId);
 }
 
-export function handleSetDebtCeiling(event: SetDebtCeilingEvent): void {
+export function handleSetBondDebtCeiling(event: SetBondDebtCeilingEvent): void {
   loadOrCreateFintroller();
 
   let fyTokenId: string = event.params.fyToken.toHexString();

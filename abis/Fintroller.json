@@ -40,6 +40,37 @@
       },
       {
         "indexed": false,
+        "internalType": "uint256",
+        "name": "oldDebtCeiling",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newDebtCeiling",
+        "type": "uint256"
+      }
+    ],
+    "name": "SetBondDebtCeiling",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "admin",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "contract FyTokenInterface",
+        "name": "fyToken",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "bool",
         "name": "state",
         "type": "bool"
@@ -77,37 +108,6 @@
       }
     ],
     "name": "SetCollateralizationRatio",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "admin",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "contract FyTokenInterface",
-        "name": "fyToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "oldDebtCeiling",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "newDebtCeiling",
-        "type": "uint256"
-      }
-    ],
-    "name": "SetDebtCeiling",
     "type": "event"
   },
   {
@@ -627,6 +627,30 @@
         "type": "address"
       },
       {
+        "internalType": "uint256",
+        "name": "newDebtCeiling",
+        "type": "uint256"
+      }
+    ],
+    "name": "setBondDebtCeiling",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "contract FyTokenInterface",
+        "name": "fyToken",
+        "type": "address"
+      },
+      {
         "internalType": "bool",
         "name": "state",
         "type": "bool"
@@ -657,30 +681,6 @@
       }
     ],
     "name": "setCollateralizationRatio",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "contract FyTokenInterface",
-        "name": "fyToken",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "newDebtCeiling",
-        "type": "uint256"
-      }
-    ],
-    "name": "setDebtCeiling",
     "outputs": [
       {
         "internalType": "bool",

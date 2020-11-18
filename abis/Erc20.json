@@ -38,7 +38,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "value",
+        "name": "amount",
         "type": "uint256"
       }
     ],
@@ -51,7 +51,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "holder",
         "type": "address"
       },
       {
@@ -70,7 +70,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "beneficiary",
         "type": "address"
       },
       {
@@ -101,7 +101,7 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "value",
+        "name": "amount",
         "type": "uint256"
       }
     ],

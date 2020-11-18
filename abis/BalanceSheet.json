@@ -53,7 +53,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -78,7 +78,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -103,7 +103,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -128,7 +128,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -147,7 +147,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -197,7 +197,7 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -371,7 +371,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -395,7 +395,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {
@@ -429,7 +429,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -468,7 +468,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -492,7 +492,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -516,7 +516,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -553,7 +553,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       }
     ],
@@ -620,7 +620,7 @@
       },
       {
         "internalType": "address",
-        "name": "account",
+        "name": "borrower",
         "type": "address"
       },
       {

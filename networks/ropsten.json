@@ -2,12 +2,12 @@
   "network": "ropsten",
   "contracts": {
     "balanceSheet": {
-      "address": "0xAa174c596D4E1732bdC8a26B7C27cF4a08a1516d",
-      "startBlock": 8946783
+      "address": "0x3d4373761B4935BFAD33FC27579299F7cEE8Da15",
+      "startBlock": 9095867
     },
     "fintroller": {
-      "address": "0x9D65603416fF39107ec969D212ACa8BE1148352a",
-      "startBlock": 8946751
+      "address": "0xEBAB5c4B7f3A49504A837D1d0821c903aA1FE611",
+      "startBlock": 9095862
     }
   }
 }
