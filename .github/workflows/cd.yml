@@ -34,7 +34,7 @@ jobs:
 
       - name: "Generate AssemblyScript types"
         run: |
-          yarn run prepare:mainnet
+          yarn run prepare:ropsten
           yarn run codegen
 
       - name: "Deploy to Ropsten"
