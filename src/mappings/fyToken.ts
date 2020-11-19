@@ -34,8 +34,6 @@ import { scaleTokenAmount } from "../helpers/math";
 export function handleBorrow(event: BorrowEvent): void {
   let borrowerId: string = event.params.borrower.toHexString();
   let borrowAmountBd: BigDecimal = event.params.borrowAmount.toBigDecimal().div(mantissaBd);
-  log.debug("borrowAmountBd", [borrowAmountBd.toString()]);
-  log.debug("mantissaBd", [mantissaBd.toString()]);
 
   loadOrCreateAccount(borrowerId);
 
