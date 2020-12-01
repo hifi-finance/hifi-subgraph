@@ -37,5 +37,8 @@ jobs:
           yarn run prepare:ropsten
           yarn run codegen
 
+      - name: "Deploy to Kovan"
+        run: "yarn run deploy:kovan"
+
       - name: "Deploy to Ropsten"
         run: "yarn run deploy:ropsten"
