@@ -1,0 +1,13 @@
+{
+  "network": "kovan",
+  "contracts": {
+    "balanceSheet": {
+      "address": "0x78EbF29f0ef586Fa6c61c0fCa1Ea82A621f644Fd",
+      "startBlock": 22277658
+    },
+    "fintroller": {
+      "address": "0x867d346a56f675b04Bf60d633c0eb9c1346e1023",
+      "startBlock": 22277639
+    }
+  }
+}
