@@ -106,6 +106,10 @@ export function createFyToken(id: string): FyToken {
   // Create the FyToken entity.
   let fyToken: FyToken = new FyToken(fyTokenAddress.toHexString());
   fyToken.collateral = collateralId;
+  fyToken.collateralizationRatio = fintrollerContract
+    .getBondCollateralizationRatio(fyTokenAddress)
+    .toBigDecimal()
+    .div(mantissaBd);
   fyToken.decimals = fyTokenContract.decimals();
   fyToken.debtCeiling = fintrollerContract.getBondDebtCeiling(fyTokenAddress).toBigDecimal().div(mantissaBd);
   fyToken.expirationTime = fyTokenContract.expirationTime().toI32();

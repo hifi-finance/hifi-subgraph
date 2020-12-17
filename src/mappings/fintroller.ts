@@ -3,6 +3,7 @@ import { log } from "@graphprotocol/graph-ts";
 import {
   ListBond as ListBondEvent,
   SetBondDebtCeiling as SetBondDebtCeilingEvent,
+  SetCollateralizationRatio as SetCollateralizationRatioEvent,
   SetLiquidationIncentive as SetLiquidationIncentiveEvent,
   SetOracle as SetOracleEvent,
 } from "../types/Fintroller/Fintroller";
@@ -28,8 +29,6 @@ export function handleListBond(event: ListBondEvent): void {
 }
 
 export function handleSetBondDebtCeiling(event: SetBondDebtCeilingEvent): void {
-  loadOrCreateFintroller();
-
   let fyTokenId: string = event.params.fyToken.toHexString();
   let fyToken: FyToken | null = FyToken.load(fyTokenId);
   if (fyToken == null) {
@@ -37,6 +36,17 @@ export function handleSetBondDebtCeiling(event: SetBondDebtCeilingEvent): void {
     return;
   }
   fyToken.debtCeiling = event.params.newDebtCeiling.toBigDecimal().div(mantissaBd);
+  fyToken.save();
+}
+
+export function handleSetCollateralizationRatio(event: SetCollateralizationRatioEvent): void {
+  let fyTokenId: string = event.params.fyToken.toHexString();
+  let fyToken: FyToken | null = FyToken.load(fyTokenId);
+  if (fyToken == null) {
+    log.error("FyToken entity expected to be exist when setting the collateralization ratio: {}", [fyTokenId]);
+    return;
+  }
+  fyToken.collateralizationRatio = event.params.newCollateralizationRatio.toBigDecimal().div(mantissaBd);
   fyToken.save();
 }
 

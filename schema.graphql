@@ -153,6 +153,8 @@ type FyToken implements Erc20 @entity {
   id: ID!
   "One-to-one relation to collateral"
   collateral: Token!
+  "Quantifies the worth of collateral that borrowers need to maintain to avoid being liquidated"
+  collateralizationRatio: BigDecimal!
   "Erc20 decimals"
   decimals: Int!
   "Limits how much debt can be issued"
