@@ -103,8 +103,13 @@ export function createFyToken(id: string): FyToken {
   createToken(collateralId);
   createToken(underlyingId);
 
+  // Create the RedemptionPool entity.
+  let redemptionPoolId: string = fyTokenContract.redemptionPool().toHexString();
+  let fyTokenId: string = fyTokenAddress.toHexString();
+  createRedemptionPool(redemptionPoolId, fyTokenId);
+
   // Create the FyToken entity.
-  let fyToken: FyToken = new FyToken(fyTokenAddress.toHexString());
+  let fyToken: FyToken = new FyToken(fyTokenId);
   fyToken.collateral = collateralId;
   fyToken.collateralizationRatio = fintrollerContract
     .getBondCollateralizationRatio(fyTokenAddress)
@@ -115,7 +120,7 @@ export function createFyToken(id: string): FyToken {
   fyToken.expirationTime = fyTokenContract.expirationTime().toI32();
   fyToken.fintroller = fintrollerDefaultId;
   fyToken.name = fyTokenContract.name();
-  fyToken.redemptionPool = fyTokenContract.redemptionPool().toHexString();
+  fyToken.redemptionPool = redemptionPoolId;
   fyToken.symbol = fyTokenContract.symbol();
   fyToken.totalSupply = fyTokenContract.totalSupply().toBigDecimal().div(mantissaBd);
   fyToken.underlying = underlyingId;
@@ -128,6 +133,7 @@ export function createRedemptionPool(id: string, fyTokenId: string): RedemptionP
   let redemptionPool: RedemptionPool = new RedemptionPool(id);
   redemptionPool.fyToken = fyTokenId;
   redemptionPool.totalUnderlyingSupply = zeroBd;
+  redemptionPool.save();
   return redemptionPool;
 }
 

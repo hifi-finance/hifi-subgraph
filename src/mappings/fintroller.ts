@@ -8,7 +8,7 @@ import {
   SetOracle as SetOracleEvent,
 } from "../types/Fintroller/Fintroller";
 import { Fintroller, FyToken } from "../types/schema";
-import { createFyToken, createRedemptionPool, loadOrCreateFintroller } from "../helpers/database";
+import { createFyToken, loadOrCreateFintroller } from "../helpers/database";
 import { mantissaBd } from "../helpers/constants";
 
 export function handleListBond(event: ListBondEvent): void {
@@ -22,10 +22,6 @@ export function handleListBond(event: ListBondEvent): void {
     return;
   }
   fyToken = createFyToken(fyTokenId);
-
-  // Create the RedemptionPool entity.
-  let redemptionPoolId: string = fyToken.redemptionPool;
-  createRedemptionPool(redemptionPoolId, fyTokenId);
 }
 
 export function handleSetBondDebtCeiling(event: SetBondDebtCeilingEvent): void {
