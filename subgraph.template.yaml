@@ -65,10 +65,10 @@ dataSources:
       eventHandlers:
         - event: ListBond(indexed address,indexed address)
           handler: handleListBond
+        - event: SetBondCollateralizationRatio(indexed address,indexed address,uint256,uint256)
+          handler: handleSetBondCollateralizationRatio
         - event: SetBondDebtCeiling(indexed address,indexed address,uint256,uint256)
           handler: handleSetBondDebtCeiling
-        - event: SetCollateralizationRatio(indexed address,indexed address,uint256,uint256)
-          handler: handleSetCollateralizationRatio
         - event: SetLiquidationIncentive(indexed address,uint256,uint256)
           handler: handleSetLiquidationIncentive
         - event: SetOracle(indexed address,address,address)
