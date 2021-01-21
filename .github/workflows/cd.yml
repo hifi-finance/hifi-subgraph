@@ -39,3 +39,6 @@ jobs:
 
       - name: "Deploy to Kovan"
         run: "yarn run deploy:kovan"
+
+      - name: "Deploy to Rinkeby"
+        run: "yarn run deploy:rinkeby"
