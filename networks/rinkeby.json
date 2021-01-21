@@ -1,5 +1,5 @@
 {
-  "network": "kovan",
+  "network": "rinkeby",
   "contracts": {
     "balanceSheet": {
       "address": "0xB9f532E6aC2e8E451f928Da8ecf8829a456d7b65",
