@@ -598,22 +598,9 @@
     "name": "oracle",
     "outputs": [
       {
-        "internalType": "contract UniswapAnchoredViewInterface",
+        "internalType": "contract ChainlinkOperatorInterface",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "oraclePricePrecisionScalar",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -761,7 +748,7 @@
   {
     "inputs": [
       {
-        "internalType": "contract UniswapAnchoredViewInterface",
+        "internalType": "contract ChainlinkOperatorInterface",
         "name": "newOracle",
         "type": "address"
       }
