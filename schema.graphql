@@ -1,7 +1,7 @@
 ### INTERFACES ###
 
 """
-Generic interface for Erc20 fyTokens.
+Generic interface for Erc20 tokens.
 """
 interface Erc20 {
   "Contract address"
@@ -53,7 +53,7 @@ interface Transaction {
 ### GENERIC TYPES ###
 
 """
-Generic type for Erc20 fyTokens.
+Generic type for Erc20 tokens.
 """
 type Token implements Erc20 @entity {
   "Contract address"
