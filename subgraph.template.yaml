@@ -1,6 +1,6 @@
 specVersion: 0.0.2
-description: Fixed-rate lending protocol on Ethereum
-repository: https://github.com/mainframehq/mainframe-subgraph
+description: Fixed-rate, fixed-term lending protocol on Ethereum
+repository: https://github.com/hifi-finance/hifi-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
