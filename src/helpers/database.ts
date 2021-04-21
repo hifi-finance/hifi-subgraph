@@ -1,5 +1,6 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
+import { Fintroller as FintrollerContract } from "../types/Fintroller/Fintroller";
 import {
   Account,
   AccountFyToken,
@@ -10,10 +11,9 @@ import {
   Token,
   Vault,
 } from "../types/schema";
-import { Erc20 as Erc20Contract } from "../types/templates/FyToken/Erc20";
-import { Fintroller as FintrollerContract } from "../types/Fintroller/Fintroller";
-import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import { FyToken as FyTokenTemplate } from "../types/templates";
+import { Erc20 as Erc20Contract } from "../types/templates/FyToken/Erc20";
+import { FyToken as FyTokenContract } from "../types/templates/FyToken/FyToken";
 import { addressZero, defaultLiquidationIncentive, fintrollerDefaultId, mantissaBd, zeroBd } from "./constants";
 
 export function getAccountFyTokenId(fyTokenId: string, accountId: string): string {
@@ -137,6 +137,9 @@ export function createRedemptionPool(id: string, fyTokenId: string): RedemptionP
   return redemptionPool;
 }
 
+// Safe to call the "decimals", "name" and "symbol" methods directly because we control the tokens that get listed
+// on Hifi. In the future, we may have to use the fail-safe "try_" functions, because some tokens like MKR and SAI
+// return the name and the symbol as a bytes32.
 export function createToken(id: string): Token {
   let contract: Erc20Contract = Erc20Contract.bind(Address.fromString(id));
   let token: Token = new Token(id);
