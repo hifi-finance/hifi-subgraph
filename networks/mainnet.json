@@ -2,12 +2,12 @@
   "network": "mainnet",
   "contracts": {
     "balanceSheet": {
-      "address": "0x10Fc2350baA7d3690BF6A8d680e9C1fb55D90A7c",
-      "startBlock": 11709675
+      "address": "0x98e06ff5d4d43cA77772004A65022725D56a5a16",
+      "startBlock": 11870256
     },
     "fintroller": {
-      "address": "0xB66A6C742a326876E1d826d8369a645d23009726",
-      "startBlock": 11706492
+      "address": "0xED4348fC8B1B634b3A0eadabFD32530046B89C60",
+      "startBlock": 11868814
     }
   }
 }
