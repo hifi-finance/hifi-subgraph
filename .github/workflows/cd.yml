@@ -31,7 +31,7 @@ jobs:
 
       - name: "Generate AssemblyScript types"
         run: |
-          yarn run prepare:kovan
+          yarn run prepare:mainnet
           yarn run codegen
 
       - name: "Deploy to Kovan"
