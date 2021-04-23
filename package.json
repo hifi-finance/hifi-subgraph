@@ -8,7 +8,7 @@
     "url": "https://hifi.finance"
   },
   "bugs": {
-    "url": "https://github.com/hifi-finance/hifi-protocol/issues"
+    "url": "https://github.com/hifi-finance/hifi-subgraph/issues"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.2",
