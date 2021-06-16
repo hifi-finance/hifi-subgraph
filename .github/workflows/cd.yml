@@ -24,7 +24,7 @@ jobs:
           path: "./node_modules"
 
       - name: "Install dependencies"
-        run: "yarn install --frozen-lockfile"
+        run: "yarn install --immutable"
 
       - name: "Lint AssemblyScript code"
         run: "yarn run lint"
