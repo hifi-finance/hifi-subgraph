@@ -7,21 +7,16 @@ on:
 
 jobs:
   cd:
-    runs-on: "macos-latest"
+    runs-on: "ubuntu-18.04"
     steps:
       - name: "Check out the repo"
         uses: "actions/checkout@v2"
 
       - name: "Install Node.js"
-        uses: "actions/setup-node@v1"
+        uses: "actions/setup-node@v2"
         with:
-          node-version: "12"
-
-      - name: "Load cache if any"
-        uses: "actions/cache@v2"
-        with:
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-          path: "./node_modules"
+          cache: "yarn"
+          node-version: "16"
 
       - name: "Install dependencies"
         run: "yarn install --immutable"
@@ -29,10 +24,11 @@ jobs:
       - name: "Lint AssemblyScript code"
         run: "yarn run lint"
 
+      - name: "Generate subgraph manifest"
+        run: "yarn run prepare:mainnet"
+
       - name: "Generate AssemblyScript types"
-        run: |
-          yarn run prepare:mainnet
-          yarn run codegen
+        run: "yarn run codegen"
 
       - name: "Deploy to Kovan"
         run: "yarn run deploy:kovan --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
