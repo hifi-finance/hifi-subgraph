@@ -42,3 +42,106 @@ dataSources:
           handler: handleWithdrawCollateral
       file: ./src/mappings/balanceSheet.ts
       language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: Fintroller
+    network: {{network}}
+    source:
+      abi: Fintroller
+      address: "{{contracts.fintroller.address}}"
+      startBlock: {{contracts.fintroller.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: Fintroller
+          file: ./abis/FintrollerV1.json
+      entities:
+        - ListBond
+        - ListCollateral
+        - SetBorrowAllowed
+        - SetCollateralizationRatio
+        - SetDebtCeiling
+        - SetDepositCollateralAllowed
+        - SetLiquidateBorrowAllowed
+        - SetLiquidationIncentive
+        - SetMaxBonds
+        - SetRedeemHTokensAllowed
+        - SetRepayBorrowAllowed
+        - SetSupplyUnderlyingAllowed
+        - TransferOwnership
+      eventHandlers:
+        - event: ListBond(indexed address,indexed address)
+          handler: handleListBond
+        - event: ListCollateral(indexed address,indexed address)
+          handler: handleListCollateral
+        - event: SetBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetBorrowAllowed
+        - event: SetCollateralizationRatio(indexed address,indexed address,uint256,uint256)
+          handler: handleSetCollateralizationRatio
+        - event: SetDebtCeiling(indexed address,indexed address,uint256,uint256)
+          handler: handleSetDebtCeiling
+        - event: SetDepositCollateralAllowed(indexed address,indexed address,bool)
+          handler: handleSetDepositCollateralAllowed
+        - event: SetLiquidateBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetLiquidateBorrowAllowed
+        - event: SetLiquidationIncentive(indexed address,address,uint256,uint256)
+          handler: handleSetLiquidationIncentive
+        - event: SetMaxBonds(indexed address,uint256,uint256)
+          handler: handleSetMaxBonds
+        - event: SetRedeemHTokensAllowed(indexed address,indexed address,bool)
+          handler: handleSetRedeemHTokensAllowed
+        - event: SetRepayBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetRepayBorrowAllowed
+        - event: SetSupplyUnderlyingAllowed(indexed address,indexed address,bool)
+          handler: handleSetSupplyUnderlyingAllowed
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
+      file: ./src/mappings/fintroller.ts
+      language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: HToken
+    network: {{network}}
+    source:
+      abi: HToken
+      address: "{{contracts.htoken.address}}"
+      startBlock: {{contracts.htoken.startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: HToken
+          file: ./abis/HToken.json
+      entities:
+        - Approval
+        - Burn
+        - Mint
+        - Recover
+        - Redeem
+        - SetBalanceSheet
+        - SetNonRecoverableTokens
+        - SupplyUnderlying
+        - Transfer
+        - TransferOwnership
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Recover(indexed address,address,uint256)
+          handler: handleRecover
+        - event: Redeem(indexed address,uint256,uint256)
+          handler: handleRedeem
+        - event: SetBalanceSheet(indexed address,address,address)
+          handler: handleSetBalanceSheet
+        - event: SetNonRecoverableTokens(indexed address,address[])
+          handler: handleSetNonRecoverableTokens
+        - event: SupplyUnderlying(indexed address,uint256,uint256)
+          handler: handleSupplyUnderlying
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
+      file: ./src/mappings/htoken.ts
+      language: wasm/assemblyscript
