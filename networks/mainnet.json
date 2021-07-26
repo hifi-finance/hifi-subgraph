@@ -1,9 +1,0 @@
-{
-  "network": "mainnet",
-  "contracts": {
-    "balanceSheet": {
-      "address": "0xDC7E1FCED65eFdf495D33de60f257a9b31256FF8",
-      "startBlock": 11131799
-    }
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "network": "ropsten",
-  "contracts": {
-    "balanceSheet": {
-      "address": "0xAa174c596D4E1732bdC8a26B7C27cF4a08a1516d",
-      "startBlock": 8946783
-    }
-  }
-}

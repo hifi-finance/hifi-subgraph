@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 description: Fixed-rate lending protocol on Ethereum
-repository: https://github.com/mainframehq/mainframe-subgraph
+repository: https://github.com/hifi-finance/hifi-subgraph-v1
 schema:
   file: ./schema.graphql
 dataSources:
@@ -16,22 +16,28 @@ dataSources:
       apiVersion: 0.0.3
       abis:
         - name: BalanceSheet
-          file: ./abis/BalanceSheet.json
+          file: ./abis/BalanceSheetV1.json
       entities:
-        - CToken
+        - Borrow
+        - DepositCollateral
+        - LiquidateBorrow
+        - RepayBorrow
+        - SetOracle
+        - TransferOwnership
+        - WithdrawCollateral
       eventHandlers:
-        - event: ClutchCollateral(indexed address,indexed address,indexed address,uint256)
-          handler: handleClutchCollateral
+        - event: Borrow(indexed address,indexed address,uint256)
+          handler: handleBorrow
         - event: DepositCollateral(indexed address,indexed address,uint256)
           handler: handleDepositCollateral
-        - event: FreeCollateral(indexed address,indexed address,uint256)
-          handler: handleFreeCollateral
-        - event: LockCollateral(indexed address,indexed address,uint256)
-          handler: handleLockCollateral
-        - event: OpenVault(indexed address,indexed address)
-          handler: handleOpenVault
-        - event: SetVaultDebt(indexed address,indexed address,uint256,uint256)
-          handler: handleSetVaultDebt
+        - event: LiquidateBorrow(indexed address,indexed address,indexed address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: RepayBorrow(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: SetOracle(indexed address,address,address)
+          handler: handleSetOracle
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
         - event: WithdrawCollateral(indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
       file: ./src/mappings/balanceSheet.ts

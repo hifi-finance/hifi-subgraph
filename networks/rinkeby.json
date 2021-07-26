@@ -1,0 +1,9 @@
+{
+  "network": "rinkeby",
+  "contracts": {
+    "balanceSheet": {
+      "address": "0x534D53c344647986cb6893218486adb2366ab824",
+      "startBlock": 8842836
+    }
+  }
+}
