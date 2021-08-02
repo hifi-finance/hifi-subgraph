@@ -1,345 +1,86 @@
-### INTERFACES ###
-
-"""
-Generic interface for Erc20 tokens.
-"""
-interface Erc20 {
-  "Contract address"
-  id: ID!
-  "Erc20 decimals"
-  decimals: Int!
-  "Erc20 name"
-  name: String!
-  "Erc20 symbol"
-  symbol: String!
-}
-
-"""
-Generic interface for HToken token transfers.
-"""
-interface HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
-  id: ID!
-  "hTokens transferred"
-  amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account that sent hTokens"
-  from: Bytes!
-  "Symbol of the hTokens transferred"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that received hTokens"
-  to: Bytes!
-}
-
-"""
-Generic interface for Ethereum transactions.
-"""
-interface Transaction {
-  "Transaction hash concatenated with the log index"
-  id: ID!
-  "Block number"
-  blockNumber: Int!
-  "Transaction log index"
-  logIndex: Int!
-  "Block timestamp"
-  timestamp: Int!
-  "Transaction hash"
-  txHash: Bytes!
-}
-
-### GENERIC TYPES ###
-
-"""
-Generic type for Erc20 tokens.
-"""
-type Token implements Erc20 @entity {
-  "Contract address"
-  id: ID!
-  "Erc20 decimals"
-  decimals: Int!
-  "Erc20 name"
-  name: String!
-  "Erc20 symbol"
-  symbol: String!
-}
-
 ### PROTOCOL TYPES ***
 
 """
-Account is an Ethereum address, with a list of all the hTokens
-and the hTokens the user is in, along with liquidation information.
+Stores high-level variables for core protocol.
 """
-type Account @entity {
-  "User Ethereum address"
-  id: ID!
-  "Array of hTokens user has opened a vault in"
-  accountHTokens: [AccountHToken!]! @derivedFrom(field: "account")
-  "How many times the user has been liquidated"
-  countLiquidated: Int!
-  "How many times the user has liquidated others"
-  countLiquidator: Int!
-  "Array of vaults opened by the user"
-  vaults: [Vault!] @derivedFrom(field: "account")
-}
-
-"""
-AccountHToken is a single account within a single hToken contract.
-"""
-type AccountHToken @entity {
-  "HToken address concatenated with user Ethereum address"
-  id: ID!
-  "One-to-one relation to Account"
-  account: Account!
-  "One-to-one relation to HToken"
-  hToken: HToken!
-  "hToken balance of the user"
-  hTokenBalance: BigDecimal!
-  "Total amount of hTokens borrowed"
-  totalHTokenBorrowed: BigDecimal!
-  "Total amount of hTokens redeemed"
-  totalHTokenRedeemed: BigDecimal!
-  "Total amount of hTokens repaid"
-  totalHTokenRepaid: BigDecimal!
-  "Total amount of underlying redeemed"
-  totalUnderlyingRedeemed: BigDecimal!
-  "Total amount of underlying supplied"
-  totalUnderlyingSupplied: BigDecimal!
-  "Transactions data"
-  transactions: [AccountHTokenTransaction!] @derivedFrom(field: "accountHToken")
-  "One-to-one relation to Vault"
-  vault: Vault!
-}
-
-"""
-Auxiliary entity for AccountHToken.
-"""
-type AccountHTokenTransaction implements Transaction @entity {
-  "User Ethereum address concatenated with transaction hash concatenated with log index"
-  id: ID!
-  "One-to-one relation to AccountHToken"
-  accountHToken: AccountHToken!
-  "Block number"
-  blockNumber: Int!
-  "Transaction log index"
-  logIndex: Int!
-  "Block timestamp"
-  timestamp: Int!
-  "Transaction hash"
-  txHash: Bytes!
-}
-
-"""
-Stores high-level variables for a Fintroller contract.
-"""
-type Fintroller @entity {
+type Core @entity {
   "Always set to 1"
   id: ID!
-  "One-to-many relation to HToken"
-  hTokens: [HToken!] @derivedFrom(field: "fintroller")
-  "Discount on collateral that liquidators receive"
-  liquidationIncentiveMantissa: BigInt!
-  "Price oracle"
-  oracle: Bytes!
+  "Array of all borrower vaults"
+  vaults: [Vault!]
 }
 
 """
-Stores high-level variables for a hToken.
-"""
-type HToken implements Erc20 @entity {
-  "Contract address"
-  id: ID!
-  "One-to-one relation to collateral"
-  collateral: Token!
-  "Quantifies the worth of collateral that borrowers need to maintain to avoid being liquidated"
-  collateralizationRatio: BigDecimal!
-  "Erc20 decimals"
-  decimals: Int!
-  "Limits how much debt can be issued"
-  debtCeiling: BigDecimal!
-  "Unix timestamp in seconds when the bond expires"
-  expirationTime: Int!
-  "One-to-one relation to Fintroller"
-  fintroller: Fintroller!
-  "Erc20 name"
-  name: String!
-  "One-to-one relation to RedemptionPool"
-  redemptionPool: RedemptionPool!
-  "Erc20 symbol"
-  symbol: String!
-  "Erc20 total supply"
-  totalSupply: BigDecimal!
-  "One-to-on relation to underlying"
-  underlying: Token!
-  "One-to-many relation to Vault"
-  vaults: [Vault!] @derivedFrom(field: "hToken")
-}
-
-"""
-Stores high-level variables for a hToken's redemption pool.
-"""
-type RedemptionPool @entity {
-  "HToken address"
-  id: ID!
-  "One-to-one relation to HToken"
-  hToken: HToken!
-  "Total amount of underlying supplied"
-  totalUnderlyingSupply: BigDecimal!
-}
-
-"""
-Stores the collateral deposited by the user, along with the debt.
+Stores the collaterals deposited by the user, along with the debts.
 """
 type Vault @entity {
-  "HToken address concatenated with user Ethereum address"
+  "User Ethereum address"
   id: ID!
-  "One-to-one relation to Account"
-  account: Account!
-  "Debt owed by the vault owner"
-  debt: BigDecimal!
+  "Creation block timestamp"
+  createTime: Int!
+  "Debts owed by the vault owner"
+  debts: [TokenAmount!]!
   "Collateral deposited"
-  freeCollateral: BigDecimal!
-  "One-to-one relation to HToken"
-  hToken: HToken!
-  "Collateral deposited and locked to issue deb"
-  lockedCollateral: BigDecimal!
-  "Vault open state"
-  isOpen: Boolean!
-}
-
-### EVENTS ***
-
-"""
-Stores information for borrows.
-"""
-type BorrowEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
-  id: ID!
-  "Amount of hTokens borrowed"
-  amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account that sent hTokens (HToken contract)"
-  from: Bytes!
-  "Symbol of the borrowed hToken"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that borrowed the hTokens"
-  to: Bytes!
+  collaterals: [TokenAmount!]!
 }
 
 """
-Stores information for burns. `To` address will always be a hToken.
+Represents a token amount.
 """
-type BurnEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
+type TokenAmount {
+  "Token contract address concatenated with user Ethereum address"
   id: ID!
-  "hTokens transferred"
+  "Token contract address"
+  token: Bytes!
+  "Token amount"
   amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account that burnt hTokens"
-  from: Bytes!
-  "Symbol of the hToken transferred"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that received hTokens (HToken contract)"
-  to: Bytes!
 }
 
 """
-Will be stored for every mint, burn, borrow, repay borrow, liquidate borrow,
-and any normal transfer between two accounts. MintEvent, BurnEvent, BorrowEvent,
-RepayBorrowEvent and LiquidationEvent all implement this type.
+Stores high-level variables for the AMM.
 """
-type HTokenTransferEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
+type Amm @entity {
+  "Always set to 1"
   id: ID!
-  "hTokens transferred"
-  amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account that sent hTokens"
-  from: Bytes!
-  "Symbol of the hToken transferred"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that received hTokens"
-  to: Bytes!
+  "Array of all AMM pools"
+  pools: [Pool!]
 }
 
 """
-Stores information for liquidations. The event is emitted from the hToken.
+Stores the pool reserves, along with the swaps.
 """
-type LiquidateBorrowEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
+type Pool @entity {
+  "Pool contract address"
   id: ID!
-  "Amount of hTokens repaid by liquidator"
-  amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account liquidated (borrower)"
-  borrower: Bytes!
-  "Collateral seized"
-  clutchedCollateralAmount: BigDecimal!
-  "Erc20 symbol of collateral clutched by liquidator"
-  collateralSymbol: String!
-  "Liquidator"
-  from: Bytes!
-  "Symbol of the hToken repaid through liquidation"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that received hTokens (HToken contract)"
-  to: Bytes!
+  "The hToken maturity timestamp"
+  maturity: BigInt!
+  "Underlying token contract address"
+  underlying: Bytes!
+  "hToken contract address"
+  hToken: Bytes!
+  "The ratio between our native precision (18) and the underlying precision"
+  underlyingPrecisionScalar: BigInt!
+  "Pool reserve of underlying token"
+  underlyingReserve: BigDecimal!
+  "Pool reserve of hToken"
+  hTokenReserve: BigDecimal!
+  "Array of all AMM trades"
+  swaps: [Swap]!
 }
 
-"""
-Stores information for mints. `From` address will always be a hToken.
-"""
-type MintEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
+type Swap @entity {
+  "Sequential id"
   id: ID!
-  "hTokens transferred"
-  amount: BigDecimal!
-  "Block number"
-  blockNumber: Int!
-  "Account that sent hTokens (HToken contract)"
+  "Account that sends token being sold"
   from: Bytes!
-  "Symbol of the hToken transferred"
-  hTokenSymbol: String!
-  "Block timestamp"
-  timestamp: Int!
-  "Account that received hTokens (minter)"
+  "Account that receives token being bought"
   to: Bytes!
-}
-
-"""
-Stores information for repays. Payer is not always the same as borrower,
-such as in the event of a liquidation.
-"""
-type RepayBorrowEvent implements HTokenTransfer @entity {
-  "Transaction hash concatenated with log index"
-  id: ID!
-  "Amount of hTokens repaid"
-  amount: BigDecimal!
-  "Account that borrowed the hTokens"
-  borrower: Bytes!
-  "Block number"
-  blockNumber: Int!
-  "Payer of the borrowed funds"
-  from: Bytes!
-  "Symbol of the hToken transferred"
-  hTokenSymbol: String!
-  "Debt still owed by the borrower"
-  newDebt: BigDecimal!
-  "Block timestamp"
+  "Underlying tokens swapped"
+  underlyingAmount: BigDecimal!
+  "hTokens swapped"
+  hTokenAmount: BigDecimal!
+  "Fee paid by user for swap"
+  swapFee: BigDecimal!
+  "Timestamp for when the swap happened"
   timestamp: Int!
-  "Account that received hTokens (HToken contract)"
-  to: Bytes!
 }
