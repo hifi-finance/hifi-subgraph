@@ -19,15 +19,15 @@ type Vault @entity {
   "Creation block timestamp"
   createTime: Int!
   "Debts owed by the vault owner"
-  debts: [TokenAmount!]!
+  debts: [TokenBalance!]!
   "Collateral deposited"
-  collaterals: [TokenAmount!]!
+  collaterals: [TokenBalance!]!
 }
 
 """
 Represents a token amount.
 """
-type TokenAmount {
+type TokenBalance @entity {
   "Token contract address concatenated with user Ethereum address"
   id: ID!
   "Token contract address"
@@ -43,7 +43,7 @@ type Amm @entity {
   "Always set to 1"
   id: ID!
   "Array of all AMM pools"
-  pools: [Pool!]
+  pools: [Pool!]!
 }
 
 """
@@ -65,7 +65,7 @@ type Pool @entity {
   "Pool reserve of hToken"
   hTokenReserve: BigDecimal!
   "Array of all AMM trades"
-  swaps: [Swap]!
+  swaps: [Swap!]!
 }
 
 type Swap @entity {
