@@ -98,13 +98,12 @@ dataSources:
           handler: handleTransferOwnership
       file: ./src/mappings/fintroller.ts
       language: wasm/assemblyscript
+templates:
   - kind: ethereum/contract
     name: HToken
     network: {{network}}
     source:
       abi: HToken
-      address: "{{contracts.htoken.address}}"
-      startBlock: {{contracts.htoken.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.3
@@ -144,4 +143,34 @@ dataSources:
         - event: TransferOwnership(indexed address,indexed address)
           handler: handleTransferOwnership
       file: ./src/mappings/htoken.ts
+      language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: HifiPool
+    network: {{network}}
+    source:
+      abi: HifiPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.3
+      abis:
+        - name: HifiPool
+          file: ./abis/HifiPool.json
+      entities:
+        - AddLiquidity
+        - Approval
+        - RemoveLiquidity
+        - Trade
+        - Transfer
+      eventHandlers:
+        - event: AddLiquidity(uint256,indexed address,uint256,uint256,uint256)
+          handler: handleAddLiquidity
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: RemoveLiquidity(uint256,indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidity
+        - event: Trade(uint256,indexed address,indexed address,int256,int256)
+          handler: handleTrade
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/amm.ts
       language: wasm/assemblyscript

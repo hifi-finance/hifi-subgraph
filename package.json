@@ -40,6 +40,7 @@
     "commit": "git-cz",
     "lint": "eslint --config ./.eslintrc.yaml --ignore-path ./.eslintignore --ext .js,.ts .",
     "prepare:mainnet": "mustache ./networks/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:polygon": "mustache ./networks/polygon.json subgraph.template.yaml > subgraph.yaml",
     "prepare:rinkeby": "mustache ./networks/rinkeby.json subgraph.template.yaml > subgraph.yaml",
     "prettier": "prettier --config .prettierrc --write \"**/*.{js,json,md,ts,yaml,yml}\"",
     "prettier:list-different": "prettier --config .prettierrc --list-different \"**/*.{js,json,md,ts,yaml,yml}\""

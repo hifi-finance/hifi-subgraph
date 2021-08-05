@@ -2,8 +2,12 @@
   "network": "rinkeby",
   "contracts": {
     "balanceSheet": {
-      "address": "0x534D53c344647986cb6893218486adb2366ab824",
-      "startBlock": 8842836
+      "address": "0x5beDD73225Beb754835DDCe096862D3A1CDf3934",
+      "startBlock": 9055807
+    },
+    "fintroller": {
+      "address": "0xA2Bc597C3Fa937475d5C0fB01fa6609708f6bf0E",
+      "startBlock": 9055692
     }
   }
 }
