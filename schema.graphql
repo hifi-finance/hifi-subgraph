@@ -6,8 +6,12 @@ Stores high-level variables for core protocol.
 type Core @entity {
   "Always set to 1"
   id: ID!
+  "Array of all listed bonds"
+  listedBonds: [Bytes!]!
+  "Array of all listed collaterals"
+  listedCollaterals: [Bytes!]!
   "Array of all borrower vaults"
-  vaults: [Vault!]
+  vaults: [Vault!]!
 }
 
 """
@@ -16,25 +20,27 @@ Stores the collaterals deposited by the user, along with the debts.
 type Vault @entity {
   "User Ethereum address"
   id: ID!
-  "Creation block timestamp"
-  createTime: Int!
-  "Debts owed by the vault owner"
-  debts: [TokenBalance!]!
   "Collateral deposited"
   collaterals: [TokenBalance!]!
+  "Creation block timestamp"
+  createTime: BigInt!
+  "Debts owed by the vault owner"
+  debts: [TokenBalance!]!
 }
 
 """
 Represents a token amount.
 """
 type TokenBalance @entity {
-  "Token contract address concatenated with user Ethereum address"
+  "User Ethereum address concatenated with token contract address"
   id: ID!
+  "Token amount"
+  amount: BigInt!
   "Token contract address"
   token: Bytes!
-  "Token amount"
-  amount: BigDecimal!
 }
+
+### AMM TYPES ***
 
 """
 Stores high-level variables for the AMM.
@@ -52,20 +58,20 @@ Stores the pool reserves, along with the swaps.
 type Pool @entity {
   "Pool contract address"
   id: ID!
-  "The hToken maturity timestamp"
-  maturity: BigInt!
-  "Underlying token contract address"
-  underlying: Bytes!
   "hToken contract address"
   hToken: Bytes!
+  "Pool reserve of hToken"
+  hTokenReserve: BigDecimal!
+  "The hToken maturity timestamp"
+  maturity: BigInt!
+  "Array of all AMM trades"
+  swaps: [Swap!]!
+  "Underlying token contract address"
+  underlying: Bytes!
   "The ratio between our native precision (18) and the underlying precision"
   underlyingPrecisionScalar: BigInt!
   "Pool reserve of underlying token"
   underlyingReserve: BigDecimal!
-  "Pool reserve of hToken"
-  hTokenReserve: BigDecimal!
-  "Array of all AMM trades"
-  swaps: [Swap!]!
 }
 
 type Swap @entity {
@@ -73,14 +79,14 @@ type Swap @entity {
   id: ID!
   "Account that sends token being sold"
   from: Bytes!
-  "Account that receives token being bought"
-  to: Bytes!
-  "Underlying tokens swapped"
-  underlyingAmount: BigDecimal!
   "hTokens swapped"
   hTokenAmount: BigDecimal!
   "Fee paid by user for swap"
   swapFee: BigDecimal!
   "Timestamp for when the swap happened"
-  timestamp: Int!
+  timestamp: BigInt!
+  "Account that receives token being bought"
+  to: Bytes!
+  "Underlying tokens swapped"
+  underlyingAmount: BigDecimal!
 }

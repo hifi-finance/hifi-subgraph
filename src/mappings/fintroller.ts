@@ -1,7 +1,5 @@
-import {} from "../types/schema";
-
 import {
-  FintrollerV1,
+  Fintroller,
   ListBond,
   ListCollateral,
   SetBorrowAllowed,
@@ -15,13 +13,25 @@ import {
   SetRepayBorrowAllowed,
   SetSupplyUnderlyingAllowed,
   TransferOwnership,
-} from "../types/FintrollerV1/FintrollerV1";
+} from "../types/Fintroller/Fintroller";
 
-import { BigInt } from "@graphprotocol/graph-ts";
+import { loadOrCreateCore } from "../helpers";
 
-export function handleListBond(event: ListBond): void {}
+export function handleListBond(event: ListBond): void {
+  let core = loadOrCreateCore();
+  let listedBonds = core.listedBonds;
+  listedBonds.push(event.params.bond);
+  core.listedBonds = listedBonds;
+  core.save();
+}
 
-export function handleListCollateral(event: ListCollateral): void {}
+export function handleListCollateral(event: ListCollateral): void {
+  let core = loadOrCreateCore();
+  let listedCollaterals = core.listedCollaterals;
+  listedCollaterals.push(event.params.collateral);
+  core.listedCollaterals = listedCollaterals;
+  core.save();
+}
 
 export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
 

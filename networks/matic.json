@@ -1,5 +1,5 @@
 {
-  "network": "polygon",
+  "network": "matic",
   "contracts": {
     "balanceSheet": {
       "address": "0x867d346a56f675b04Bf60d633c0eb9c1346e1023",

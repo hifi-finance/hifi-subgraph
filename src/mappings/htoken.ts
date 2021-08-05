@@ -12,9 +12,7 @@ import {
   SupplyUnderlying,
   Transfer,
   TransferOwnership,
-} from "../types/HToken/HToken";
-
-import { BigInt } from "@graphprotocol/graph-ts";
+} from "../types/templates/HToken/HToken";
 
 export function handleApproval(event: Approval): void {}
 
