@@ -1,32 +1,11 @@
-import {
-  AddLiquidity,
-  Approval,
-  HifiPool,
-  RemoveLiquidity,
-  Trade,
-  Transfer,
-} from "../types/templates/HifiPool/HifiPool";
+import { AddLiquidity, Approval, RemoveLiquidity, Trade, Transfer } from "../types/templates/HifiPool/HifiPool";
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Pool, Swap } from "../types/schema";
+import { loadOrCreatePool, normalize } from "../helpers";
 
-import { normalize } from "../helpers";
+import { Swap } from "../types/schema";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-  let pool = Pool.load(event.address.toHex());
-
-  if (pool == null) {
-    pool = new Pool(event.address.toHex());
-    pool.maturity = event.params.maturity;
-
-    let contract = HifiPool.bind(event.address);
-    pool.underlying = contract.underlying();
-    pool.hToken = contract.hToken();
-    pool.underlyingPrecisionScalar = contract.underlyingPrecisionScalar();
-
-    pool.underlyingReserve = BigDecimal.fromString("0");
-    pool.hTokenReserve = BigDecimal.fromString("0");
-    pool.swaps = [];
-  }
+  let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.plus(
     normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar)),
@@ -37,7 +16,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-  let pool = Pool.load(event.address.toHex());
+  let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.minus(
     normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar)),
@@ -48,20 +27,21 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 }
 
 export function handleTrade(event: Trade): void {
-  let pool = Pool.load(event.address.toHex());
+  let pool = loadOrCreatePool(event.address.toHex());
   let swap = new Swap(BigInt.fromI32(pool.swaps.length).toHex());
 
-  swap.timestamp = event.block.timestamp;
-
   swap.from = event.params.from;
+  swap.hTokenAmount = normalize(event.params.hTokenAmount);
+  // TODO: calculate swapFee
+  swap.swapFee = BigDecimal.fromString("0");
+  swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
   swap.underlyingAmount = normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar));
-  swap.hTokenAmount = normalize(event.params.hTokenAmount);
-
   swap.save();
 
-  pool.swaps = pool.swaps.concat([swap.id]);
-
+  let swaps = pool.swaps;
+  swaps.push(swap.id);
+  pool.swaps = swaps;
   pool.underlyingReserve = pool.underlyingReserve.minus(swap.underlyingAmount);
   pool.hTokenReserve = pool.hTokenReserve.minus(swap.hTokenAmount);
 
