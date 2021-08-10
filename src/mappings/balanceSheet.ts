@@ -7,13 +7,13 @@ import {
   TransferOwnership,
   WithdrawCollateral,
 } from "../types/BalanceSheet/BalanceSheet";
-import { loadOrCreateTokenBalance, loadOrCreateVault } from "../helpers";
+import { loadOrCreateCore, loadOrCreateTokenBalance, loadOrCreateVault, normalize } from "../helpers";
 
 export function handleBorrow(event: Borrow): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let debts = vault.debts;
   let debt = loadOrCreateTokenBalance(event.params.account, event.params.bond);
-  debt.amount = debt.amount.plus(event.params.borrowAmount);
+  debt.amount = debt.amount.plus(normalize(event.params.borrowAmount, debt.decimals));
   debt.save();
   debts.push(debt.id);
   vault.debts = debts;
@@ -21,21 +21,26 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleDepositCollateral(event: DepositCollateral): void {
+  let core = loadOrCreateCore();
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
   let collateral = loadOrCreateTokenBalance(event.params.account, event.params.collateral);
-  collateral.amount = collateral.amount.plus(event.params.collateralAmount);
+  collateral.amount = collateral.amount.plus(normalize(event.params.collateralAmount, collateral.decimals));
   collateral.save();
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;
   vault.save();
+  let vaults = core.vaults;
+  vaults.push(vault.id);
+  core.vaults = vaults;
+  core.save();
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
   let collateral = loadOrCreateTokenBalance(event.params.borrower, event.params.collateral);
-  collateral.amount = collateral.amount.minus(event.params.seizedCollateralAmount);
+  collateral.amount = collateral.amount.minus(normalize(event.params.seizedCollateralAmount, collateral.decimals));
   collateral.save();
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;
@@ -46,7 +51,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
   let debts = vault.debts;
   let debt = loadOrCreateTokenBalance(event.params.borrower, event.params.bond);
-  debt.amount = debt.amount.minus(event.params.repayAmount);
+  debt.amount = debt.amount.minus(normalize(event.params.repayAmount, debt.decimals));
   debt.save();
   debts.push(debt.id);
   vault.debts = debts;
@@ -61,7 +66,7 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
   let collateral = loadOrCreateTokenBalance(event.params.account, event.params.collateral);
-  collateral.amount = collateral.amount.minus(event.params.collateralAmount);
+  collateral.amount = collateral.amount.minus(normalize(event.params.collateralAmount, collateral.decimals));
   collateral.save();
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;

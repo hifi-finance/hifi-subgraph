@@ -15,6 +15,8 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.3
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: BalanceSheet
           file: ./abis/BalanceSheetV1.json
       entities:
@@ -108,6 +110,8 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.3
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: HToken
           file: ./abis/HToken.json
       entities:

@@ -1,6 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Amm, Core, Pool, TokenBalance, Vault } from "../types/schema";
 
+import { Erc20 as Erc20Contract } from "../types/templates/HToken/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { SINGLETON_INDEX } from "./constants";
@@ -32,7 +33,7 @@ export function createPool(id: string): Pool {
 
   // Bind the HifiPool contract and read its state.
   let pool: Pool = new Pool(id);
-  let contract = HifiPoolContract.bind(hifiPoolAddress);
+  let contract: HifiPoolContract = HifiPoolContract.bind(hifiPoolAddress);
   pool.hToken = contract.hToken();
   pool.hTokenReserve = BigInt.fromI32(0).toBigDecimal();
   pool.maturity = contract.maturity();
@@ -54,7 +55,9 @@ export function createPool(id: string): Pool {
 
 export function createTokenBalance(account: Address, token: Address): TokenBalance {
   let tokenBalance: TokenBalance = new TokenBalance(getAccountTokenId(account.toHex(), token.toHex()));
-  tokenBalance.amount = BigInt.fromI32(0);
+  tokenBalance.amount = BigInt.fromI32(0).toBigDecimal();
+  let erc20: Erc20Contract = Erc20Contract.bind(token);
+  tokenBalance.decimals = erc20.decimals();
   tokenBalance.token = token;
   tokenBalance.save();
   return tokenBalance;

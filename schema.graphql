@@ -35,7 +35,9 @@ type TokenBalance @entity {
   "User Ethereum address concatenated with token contract address"
   id: ID!
   "Token amount"
-  amount: BigInt!
+  amount: BigDecimal!
+  "Token decimals"
+  decimals: Int!
   "Token contract address"
   token: Bytes!
 }
