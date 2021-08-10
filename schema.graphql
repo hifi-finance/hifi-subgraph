@@ -1,3 +1,31 @@
+### GENERIC TYPES ***
+
+"""
+Represents a basic ERC20 token.
+"""
+type Token @entity {
+  "Contract address"
+  id: ID!
+  "Token decimals"
+  decimals: Int!
+  "Token name"
+  name: String!
+  "Token symbol"
+  symbol: String!
+}
+
+"""
+Represents a token amount.
+"""
+type TokenBalance @entity {
+  "User Ethereum address concatenated with token contract address"
+  id: ID!
+  "Token amount"
+  amount: BigDecimal!
+  "Token details"
+  token: Token!
+}
+
 ### PROTOCOL TYPES ***
 
 """
@@ -26,20 +54,6 @@ type Vault @entity {
   createTime: BigInt!
   "Debts owed by the vault owner"
   debts: [TokenBalance!]!
-}
-
-"""
-Represents a token amount.
-"""
-type TokenBalance @entity {
-  "User Ethereum address concatenated with token contract address"
-  id: ID!
-  "Token amount"
-  amount: BigDecimal!
-  "Token decimals"
-  decimals: Int!
-  "Token contract address"
-  token: Bytes!
 }
 
 ### AMM TYPES ***

@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Amm, Core, Pool, TokenBalance, Vault } from "../types/schema";
+import { Amm, Core, Pool, Token, TokenBalance, Vault } from "../types/schema";
 
 import { Erc20 as Erc20Contract } from "../types/templates/HToken/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
@@ -53,12 +53,20 @@ export function createPool(id: string): Pool {
   return pool;
 }
 
+export function createToken(id: string): Token {
+  let token: Token = new Token(id);
+  let erc20: Erc20Contract = Erc20Contract.bind(Address.fromString(id));
+  token.decimals = erc20.decimals();
+  token.name = erc20.name();
+  token.symbol = erc20.symbol();
+  token.save();
+  return token;
+}
+
 export function createTokenBalance(account: Address, token: Address): TokenBalance {
   let tokenBalance: TokenBalance = new TokenBalance(getAccountTokenId(account.toHex(), token.toHex()));
   tokenBalance.amount = BigInt.fromI32(0).toBigDecimal();
-  let erc20: Erc20Contract = Erc20Contract.bind(token);
-  tokenBalance.decimals = erc20.decimals();
-  tokenBalance.token = token;
+  tokenBalance.token = loadOrCreateToken(token.toHexString()).id;
   tokenBalance.save();
   return tokenBalance;
 }
@@ -86,6 +94,14 @@ export function loadOrCreatePool(id: string): Pool {
     pool = createPool(id);
   }
   return pool as Pool;
+}
+
+export function loadOrCreateToken(tokenId: string): Token {
+  let token: Token | null = Token.load(tokenId);
+  if (token == null) {
+    token = createToken(tokenId);
+  }
+  return token as Token;
 }
 
 export function loadOrCreateTokenBalance(account: Address, token: Address): TokenBalance {
