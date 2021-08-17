@@ -2,12 +2,16 @@
   "network": "rinkeby",
   "contracts": {
     "balanceSheet": {
-      "address": "0x5beDD73225Beb754835DDCe096862D3A1CDf3934",
-      "startBlock": 9055807
+      "address": "0x03173496a5BABee37E335Fa1522f4675478E27C8",
+      "startBlock": 9110285
     },
     "fintroller": {
-      "address": "0xA2Bc597C3Fa937475d5C0fB01fa6609708f6bf0E",
-      "startBlock": 9055692
+      "address": "0x0E4FBA040104632a0b7F0B792DB1E5a8193098b0",
+      "startBlock": 9110247
+    },
+    "hifiPoolRegistry": {
+      "address": "0x2B6E504860fdEbBD81426f58A2563a6C28E67817",
+      "startBlock": 9110332
     }
   }
 }

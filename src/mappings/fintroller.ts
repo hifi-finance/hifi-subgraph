@@ -13,11 +13,10 @@ import {
   SetSupplyUnderlyingAllowed,
   TransferOwnership,
 } from "../types/Fintroller/Fintroller";
-import { loadOrCreateCore, loadOrCreatePool } from "../helpers";
+
+import { loadOrCreateCore } from "../helpers";
 
 export function handleListBond(event: ListBond): void {
-  // // TODO: delete line below once HifiPoolRegistry is integrated
-  // loadOrCreatePool("0x378cC4985f5507Eb605Ed29a2C4167c4cf2215F3");
   let core = loadOrCreateCore();
   let listedBonds = core.listedBonds;
   listedBonds.push(event.params.bond);
@@ -26,8 +25,6 @@ export function handleListBond(event: ListBond): void {
 }
 
 export function handleListCollateral(event: ListCollateral): void {
-  // // TODO: delete line below once HifiPoolRegistry is integrated
-  // loadOrCreatePool("0x378cC4985f5507Eb605Ed29a2C4167c4cf2215F3");
   let core = loadOrCreateCore();
   let listedCollaterals = core.listedCollaterals;
   listedCollaterals.push(event.params.collateral);
