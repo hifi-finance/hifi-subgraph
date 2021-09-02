@@ -5,6 +5,7 @@ import { Erc20 as Erc20Contract } from "../types/templates/HToken/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { SINGLETON_INDEX } from "./constants";
+import { store } from "@graphprotocol/graph-ts";
 
 export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);
@@ -126,4 +127,8 @@ export function loadOrCreateVault(id: string, createTime: BigInt): Vault {
     vault = createVault(id, createTime);
   }
   return vault as Vault;
+}
+
+export function removePool(id: string): void {
+  store.remove("Pool", id);
 }
