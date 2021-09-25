@@ -1,5 +1,4 @@
 [
-  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
   {
     "anonymous": false,
     "inputs": [{ "indexed": true, "internalType": "contract IHifiPool", "name": "pool", "type": "address" }],

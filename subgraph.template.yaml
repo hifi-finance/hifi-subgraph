@@ -13,7 +13,7 @@ dataSources:
       startBlock: {{contracts.balanceSheet.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.5
       abis:
         - name: Erc20
           file: ./abis/Erc20.json
@@ -53,7 +53,7 @@ dataSources:
       startBlock: {{contracts.fintroller.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.5
       abis:
         - name: Fintroller
           file: ./abis/FintrollerV1.json
@@ -109,7 +109,7 @@ dataSources:
       startBlock: {{contracts.hifiPoolRegistry.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.5
       abis:
         - name: HifiPool
           file: ./abis/HifiPool.json
@@ -136,7 +136,7 @@ templates:
       abi: HToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.5
       abis:
         - name: Erc20
           file: ./abis/Erc20.json
@@ -183,7 +183,7 @@ templates:
       abi: HifiPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.3
+      apiVersion: 0.0.5
       abis:
         - name: HifiPool
           file: ./abis/HifiPool.json
@@ -204,5 +204,5 @@ templates:
           handler: handleTrade
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/mappings/amm.ts
+      file: ./src/mappings/hifiPool.ts
       language: wasm/assemblyscript

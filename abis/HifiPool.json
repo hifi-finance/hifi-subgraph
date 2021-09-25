@@ -1,50 +1,12 @@
 [
   {
-    "inputs": [
-      { "internalType": "string", "name": "name_", "type": "string" },
-      { "internalType": "string", "name": "symbol_", "type": "string" },
-      {
-        "internalType": "contract IHToken",
-        "name": "hToken_",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maturity",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "underlyingAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "hTokenAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "poolTokenAmount",
-        "type": "uint256"
-      }
+      { "indexed": false, "internalType": "uint256", "name": "maturity", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "provider", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "underlyingAmount", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "hTokenAmount", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "poolTokenAmount", "type": "uint256" }
     ],
     "name": "AddLiquidity",
     "type": "event"
@@ -52,24 +14,9 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "spender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "spender", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
     "name": "Approval",
     "type": "event"
@@ -77,36 +24,11 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maturity",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "provider",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "underlyingAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "hTokenAmount",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "poolTokenAmount",
-        "type": "uint256"
-      }
+      { "indexed": false, "internalType": "uint256", "name": "maturity", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "provider", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "underlyingAmount", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "hTokenAmount", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "poolTokenAmount", "type": "uint256" }
     ],
     "name": "RemoveLiquidity",
     "type": "event"
@@ -114,36 +36,11 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "maturity",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "int256",
-        "name": "underlyingAmount",
-        "type": "int256"
-      },
-      {
-        "indexed": false,
-        "internalType": "int256",
-        "name": "hTokenAmount",
-        "type": "int256"
-      }
+      { "indexed": false, "internalType": "uint256", "name": "maturity", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+      { "indexed": false, "internalType": "int256", "name": "underlyingAmount", "type": "int256" },
+      { "indexed": false, "internalType": "int256", "name": "hTokenAmount", "type": "int256" }
     ],
     "name": "Trade",
     "type": "event"
@@ -151,24 +48,9 @@
   {
     "anonymous": false,
     "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "from",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+      { "indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
     "name": "Transfer",
     "type": "event"
@@ -215,20 +97,10 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "poolTokensBurned",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "poolTokensBurned", "type": "uint256" }],
     "name": "burn",
     "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "underlyingReturned",
-        "type": "uint256"
-      },
+      { "internalType": "uint256", "name": "underlyingReturned", "type": "uint256" },
       { "internalType": "uint256", "name": "hTokenReturned", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
@@ -264,11 +136,7 @@
   {
     "inputs": [
       { "internalType": "address", "name": "spender", "type": "address" },
-      {
-        "internalType": "uint256",
-        "name": "subtractedValue",
-        "type": "uint256"
-      }
+      { "internalType": "uint256", "name": "subtractedValue", "type": "uint256" }
     ],
     "name": "decreaseAllowance",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
@@ -276,15 +144,29 @@
     "type": "function"
   },
   {
+    "inputs": [{ "internalType": "uint256", "name": "poolTokensBurned", "type": "uint256" }],
+    "name": "getBurnOutputs",
+    "outputs": [
+      { "internalType": "uint256", "name": "underlyingReturned", "type": "uint256" },
+      { "internalType": "uint256", "name": "hTokenReturned", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "underlyingOffered", "type": "uint256" }],
+    "name": "getMintInputs",
+    "outputs": [
+      { "internalType": "uint256", "name": "hTokenRequired", "type": "uint256" },
+      { "internalType": "uint256", "name": "poolTokensMinted", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getNormalizedUnderlyingReserves",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "normalizedUnderlyingReserves",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "normalizedUnderlyingReserves", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -319,13 +201,7 @@
   {
     "inputs": [],
     "name": "getVirtualHTokenReserves",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "virtualHTokenReserves",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "virtualHTokenReserves", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -354,21 +230,9 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "underlyingOffered",
-        "type": "uint256"
-      }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "underlyingOffered", "type": "uint256" }],
     "name": "mint",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "poolTokensMinted",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "poolTokensMinted", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
