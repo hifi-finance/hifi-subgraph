@@ -35,7 +35,7 @@ export function handleTrade(event: Trade): void {
   // // TODO: calculate swapFee
   // // let contract = ...
   // swap.swapFee = contract.getImplicitSwapFee(event.params.underlyingAmount, event.params.hTokenAmount, newHtokenAmount, block.timestamp)
-  swap.swapFee = BigDecimal.fromString("0");
+  // swap.swapFee = BigDecimal.fromString("0");
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
   swap.underlyingAmount = normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar));
