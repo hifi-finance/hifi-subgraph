@@ -1,8 +1,8 @@
-import { AddLiquidity, Approval, RemoveLiquidity, Trade, Transfer } from "../types/templates/HifiPool/HifiPool";
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { loadOrCreatePool, normalize } from "../helpers";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 
+import { loadOrCreatePool, normalize } from "../helpers";
 import { Swap } from "../types/schema";
+import { AddLiquidity, Approval, RemoveLiquidity, Trade, Transfer } from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = loadOrCreatePool(event.address.toHex());
@@ -28,7 +28,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 export function handleTrade(event: Trade): void {
   let pool = loadOrCreatePool(event.address.toHex());
-  let swap = new Swap(BigInt.fromI32(pool.swaps.length).toHex());
+  let swap = new Swap(event.transaction.hash.toHex());
 
   swap.from = event.params.from;
   swap.hTokenAmount = normalize(event.params.hTokenAmount);
