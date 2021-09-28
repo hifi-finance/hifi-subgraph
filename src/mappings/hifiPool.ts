@@ -30,22 +30,32 @@ export function handleTrade(event: Trade): void {
   let pool = loadOrCreatePool(event.address.toHex());
   let swap = new Swap(event.transaction.hash.toHex());
 
+  let underlyingAmount = normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar));
+  let hTokenAmount = normalize(event.params.hTokenAmount);
+  let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
+  let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
+
+  let t: f64 = <f64>event.params.maturity.minus(event.block.timestamp).toI32() / <f64>126144000;
+  let oneMinusT: f64 = <f64>1 - t;
+  let a: f64 = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
+  let b: f64 = Math.pow(parseFloat(pool.hTokenReserve.toString()), oneMinusT);
+  let c: f64 = Math.pow(parseFloat(newHTokenReserve.toString()), oneMinusT);
+  let newUnderlyingReserveWithoutFee: f64 = Math.pow(a + b - c, <f64>1 / oneMinusT);
+  let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
+
   swap.from = event.params.from;
-  swap.hTokenAmount = normalize(event.params.hTokenAmount);
-  // // TODO: calculate swapFee
-  // // let contract = ...
-  // swap.swapFee = contract.getImplicitSwapFee(event.params.underlyingAmount, event.params.hTokenAmount, newHtokenAmount, block.timestamp)
-  // swap.swapFee = BigDecimal.fromString("0");
+  swap.hTokenAmount = hTokenAmount;
+  swap.swapFee = BigDecimal.fromString(diff.toString());
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
-  swap.underlyingAmount = normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar));
+  swap.underlyingAmount = underlyingAmount;
   swap.save();
 
   let swaps = pool.swaps;
   swaps.push(swap.id);
   pool.swaps = swaps;
-  pool.underlyingReserve = pool.underlyingReserve.minus(swap.underlyingAmount);
-  pool.hTokenReserve = pool.hTokenReserve.minus(swap.hTokenAmount);
+  pool.underlyingReserve = newUnderlyingReserve;
+  pool.hTokenReserve = newHTokenReserve;
 
   pool.save();
 }

@@ -1,4 +1,11 @@
 import {
+  loadOrCreateCore,
+  loadOrCreateToken,
+  loadOrCreateTokenBalance,
+  loadOrCreateVault,
+  normalize,
+} from "../helpers";
+import {
   Borrow,
   DepositCollateral,
   LiquidateBorrow,
@@ -7,13 +14,6 @@ import {
   TransferOwnership,
   WithdrawCollateral,
 } from "../types/BalanceSheet/BalanceSheet";
-import {
-  loadOrCreateCore,
-  loadOrCreateToken,
-  loadOrCreateTokenBalance,
-  loadOrCreateVault,
-  normalize,
-} from "../helpers";
 
 export function handleBorrow(event: Borrow): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
