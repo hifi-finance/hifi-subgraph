@@ -138,8 +138,6 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
-        - name: Erc20
-          file: ./abis/Erc20.json
         - name: HToken
           file: ./abis/HToken.json
       entities:
@@ -185,6 +183,10 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
+        - name: ChainlinkOperator
+          file: ./abis/ChainlinkOperator.json
         - name: HifiPool
           file: ./abis/HifiPool.json
       entities:

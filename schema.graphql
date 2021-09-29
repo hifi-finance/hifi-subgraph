@@ -97,8 +97,10 @@ type Swap @entity {
   from: Bytes!
   "hTokens swapped"
   hTokenAmount: BigDecimal!
-  "Fee paid by user for swap"
+  "Fee paid by user for swap (in underlying)"
   swapFee: BigDecimal!
+  "Fee paid by user for swap (in USD)"
+  swapFeeUsd: BigDecimal!
   "Timestamp for when the swap happened"
   timestamp: BigInt!
   "Account that receives token being bought"

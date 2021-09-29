@@ -1,11 +1,11 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Amm, Core, Pool, Token, TokenBalance, Vault } from "../types/schema";
-
-import { Erc20 as Erc20Contract } from "../types/templates/HToken/Erc20";
-import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
-import { HifiPool as HifiPoolTemplate } from "../types/templates";
-import { SINGLETON_INDEX } from "./constants";
 import { store } from "@graphprotocol/graph-ts";
+
+import { Amm, Core, Pool, Token, TokenBalance, Vault } from "../types/schema";
+import { HifiPool as HifiPoolTemplate } from "../types/templates";
+import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
+import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
+import { SINGLETON_INDEX } from "./constants";
 
 export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);

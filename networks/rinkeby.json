@@ -5,6 +5,10 @@
       "address": "0xfe6E92a567565fCB19d850B147DC8af7Ec273c35",
       "startBlock": 9349804
     },
+    "chainlinkOperator": {
+      "address": "0x2fFA6652126Ce5e1edb5bDa68780D632cF8E6361",
+      "startBlock": 9346304
+    },
     "fintroller": {
       "address": "0xbBd74B4F130ac3B6Daa2956D20c25Eb61DD58cd4",
       "startBlock": 9346169

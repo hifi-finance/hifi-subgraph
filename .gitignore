@@ -8,6 +8,7 @@ src/types/
 .DS_Store
 .env
 npm-debug.log*
+src/helpers/constants.ts
 subgraph.yaml
 yarn-debug.log*
 yarn-error.log*
