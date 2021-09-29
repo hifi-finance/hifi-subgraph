@@ -2,7 +2,14 @@ import { BigDecimal } from "@graphprotocol/graph-ts";
 
 import { loadOrCreatePool, normalize } from "../helpers";
 import { Swap } from "../types/schema";
-import { AddLiquidity, Approval, RemoveLiquidity, Trade, Transfer } from "../types/templates/HifiPool/HifiPool";
+import {
+  AddLiquidity,
+  Approval,
+  HifiPool,
+  RemoveLiquidity,
+  Trade,
+  Transfer,
+} from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = loadOrCreatePool(event.address.toHex());
@@ -35,12 +42,13 @@ export function handleTrade(event: Trade): void {
   let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
   let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
 
-  let t: f64 = <f64>event.params.maturity.minus(event.block.timestamp).toI32() / <f64>126144000;
-  let oneMinusT: f64 = <f64>1 - t;
+  let totalSupply = normalize(HifiPool.bind(event.address).totalSupply());
+  let t: f64 = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
+  let oneMinusT: f64 = parseFloat("1") - t;
   let a: f64 = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
-  let b: f64 = Math.pow(parseFloat(pool.hTokenReserve.toString()), oneMinusT);
-  let c: f64 = Math.pow(parseFloat(newHTokenReserve.toString()), oneMinusT);
-  let newUnderlyingReserveWithoutFee: f64 = Math.pow(a + b - c, <f64>1 / oneMinusT);
+  let b: f64 = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
+  let c: f64 = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
+  let newUnderlyingReserveWithoutFee: f64 = Math.pow(a + b - c, parseFloat("1") / oneMinusT);
   let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
 
   swap.from = event.params.from;
