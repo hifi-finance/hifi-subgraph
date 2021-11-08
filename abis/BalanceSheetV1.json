@@ -177,6 +177,17 @@
   },
   {
     "inputs": [
+      { "internalType": "contract IErc20", "name": "collateral", "type": "address" },
+      { "internalType": "uint256", "name": "seizableCollateralAmount", "type": "uint256" },
+      { "internalType": "contract IHToken", "name": "bond", "type": "address" }
+    ],
+    "name": "getRepayAmount",
+    "outputs": [{ "internalType": "uint256", "name": "repayAmount", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "contract IHToken", "name": "bond", "type": "address" },
       { "internalType": "uint256", "name": "repayAmount", "type": "uint256" },
       { "internalType": "contract IErc20", "name": "collateral", "type": "address" }

@@ -61,7 +61,7 @@ dataSources:
         - ListBond
         - ListCollateral
         - SetBorrowAllowed
-        - SetCollateralizationRatio
+        - SetCollateralCeiling
         - SetDebtCeiling
         - SetDepositCollateralAllowed
         - SetLiquidateBorrowAllowed
@@ -78,8 +78,8 @@ dataSources:
           handler: handleListCollateral
         - event: SetBorrowAllowed(indexed address,indexed address,bool)
           handler: handleSetBorrowAllowed
-        - event: SetCollateralizationRatio(indexed address,indexed address,uint256,uint256)
-          handler: handleSetCollateralizationRatio
+        - event: SetCollateralCeiling(indexed address,indexed address,uint256,uint256)
+          handler: handleSetCollateralCeiling
         - event: SetDebtCeiling(indexed address,indexed address,uint256,uint256)
           handler: handleSetDebtCeiling
         - event: SetDepositCollateralAllowed(indexed address,indexed address,bool)

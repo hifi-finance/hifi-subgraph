@@ -1,8 +1,9 @@
+import { loadOrCreateCore } from "../helpers";
 import {
   ListBond,
   ListCollateral,
   SetBorrowAllowed,
-  SetCollateralizationRatio,
+  SetCollateralCeiling,
   SetDebtCeiling,
   SetDepositCollateralAllowed,
   SetLiquidateBorrowAllowed,
@@ -13,8 +14,6 @@ import {
   SetSupplyUnderlyingAllowed,
   TransferOwnership,
 } from "../types/Fintroller/Fintroller";
-
-import { loadOrCreateCore } from "../helpers";
 
 export function handleListBond(event: ListBond): void {
   let core = loadOrCreateCore();
@@ -34,7 +33,7 @@ export function handleListCollateral(event: ListCollateral): void {
 
 export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
 
-export function handleSetCollateralizationRatio(event: SetCollateralizationRatio): void {}
+export function handleSetCollateralCeiling(event: SetCollateralCeiling): void {}
 
 export function handleSetDebtCeiling(event: SetDebtCeiling): void {}
 
