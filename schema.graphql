@@ -26,19 +26,19 @@ type TokenBalance @entity {
   token: Token!
 }
 
-### PROTOCOL TYPES ***
-
 """
-Stores high-level variables for core protocol.
+Stores high-level variables.
 """
-type Core @entity {
+type Hifi @entity {
   "Always set to 1"
   id: ID!
   "Array of all listed bonds"
   listedBonds: [Bytes!]!
   "Array of all listed collaterals"
   listedCollaterals: [Bytes!]!
-  "Array of all borrower vaults"
+  "Array of all AMM pools"
+  pools: [Pool!]!
+  "Array of all user vaults"
   vaults: [Vault!]!
 }
 
@@ -56,18 +56,6 @@ type Vault @entity {
   debts: [TokenBalance!]!
 }
 
-### AMM TYPES ***
-
-"""
-Stores high-level variables for the AMM.
-"""
-type Amm @entity {
-  "Always set to 1"
-  id: ID!
-  "Array of all AMM pools"
-  pools: [Pool!]!
-}
-
 """
 Stores the pool reserves, along with the swaps.
 """
@@ -80,12 +68,10 @@ type Pool @entity {
   hTokenReserve: BigDecimal!
   "The hToken maturity timestamp"
   maturity: BigInt!
-  "Array of all AMM trades"
+  "Array of all pool trades"
   swaps: [Swap!]!
   "Underlying token contract address"
   underlying: Bytes!
-  "The ratio between our native precision (18) and the underlying precision"
-  underlyingPrecisionScalar: BigInt!
   "Pool reserve of underlying token"
   underlyingReserve: BigDecimal!
 }

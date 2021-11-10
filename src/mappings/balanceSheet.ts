@@ -1,5 +1,5 @@
 import {
-  loadOrCreateCore,
+  loadOrCreateHifi,
   loadOrCreateToken,
   loadOrCreateTokenBalance,
   loadOrCreateVault,
@@ -27,7 +27,7 @@ export function handleBorrow(event: Borrow): void {
 }
 
 export function handleDepositCollateral(event: DepositCollateral): void {
-  let core = loadOrCreateCore();
+  let hifi = loadOrCreateHifi();
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
   let collateral = loadOrCreateTokenBalance(event.params.account, event.params.collateral);
@@ -38,10 +38,10 @@ export function handleDepositCollateral(event: DepositCollateral): void {
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;
   vault.save();
-  let vaults = core.vaults;
+  let vaults = hifi.vaults;
   vaults.push(vault.id);
-  core.vaults = vaults;
-  core.save();
+  hifi.vaults = vaults;
+  hifi.save();
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {

@@ -1,4 +1,4 @@
-import { loadOrCreateCore } from "../helpers";
+import { loadOrCreateHifi } from "../helpers";
 import {
   ListBond,
   ListCollateral,
@@ -16,19 +16,19 @@ import {
 } from "../types/Fintroller/Fintroller";
 
 export function handleListBond(event: ListBond): void {
-  let core = loadOrCreateCore();
-  let listedBonds = core.listedBonds;
+  let hifi = loadOrCreateHifi();
+  let listedBonds = hifi.listedBonds;
   listedBonds.push(event.params.bond);
-  core.listedBonds = listedBonds;
-  core.save();
+  hifi.listedBonds = listedBonds;
+  hifi.save();
 }
 
 export function handleListCollateral(event: ListCollateral): void {
-  let core = loadOrCreateCore();
-  let listedCollaterals = core.listedCollaterals;
+  let hifi = loadOrCreateHifi();
+  let listedCollaterals = hifi.listedCollaterals;
   listedCollaterals.push(event.params.collateral);
-  core.listedCollaterals = listedCollaterals;
-  core.save();
+  hifi.listedCollaterals = listedCollaterals;
+  hifi.save();
 }
 
 export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}

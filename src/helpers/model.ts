@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { store } from "@graphprotocol/graph-ts";
 
-import { Amm, Core, Pool, Token, TokenBalance, Vault } from "../types/schema";
+import { Hifi, Pool, Token, TokenBalance, Vault } from "../types/schema";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
@@ -11,20 +11,14 @@ export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);
 }
 
-export function createAmm(): Amm {
-  let amm: Amm = new Amm(SINGLETON_INDEX);
-  amm.pools = [];
-  amm.save();
-  return amm;
-}
-
-export function createCore(): Core {
-  let core: Core = new Core(SINGLETON_INDEX);
-  core.listedBonds = [];
-  core.listedCollaterals = [];
-  core.vaults = [];
-  core.save();
-  return core;
+export function createHifi(): Hifi {
+  let hifi: Hifi = new Hifi(SINGLETON_INDEX);
+  hifi.listedBonds = [];
+  hifi.listedCollaterals = [];
+  hifi.pools = [];
+  hifi.vaults = [];
+  hifi.save();
+  return hifi;
 }
 
 export function createPool(id: string): Pool {
@@ -40,16 +34,15 @@ export function createPool(id: string): Pool {
   pool.maturity = contract.maturity();
   pool.swaps = [];
   pool.underlying = contract.underlying();
-  pool.underlyingPrecisionScalar = contract.underlyingPrecisionScalar();
   pool.underlyingReserve = BigInt.fromI32(0).toBigDecimal();
   pool.save();
 
   // Push newly-created pool to the AMM.
-  let amm = loadOrCreateAmm();
-  let pools = amm.pools;
+  let hifi = loadOrCreateHifi();
+  let pools = hifi.pools;
   pools.push(pool.id);
-  amm.pools = pools;
-  amm.save();
+  hifi.pools = pools;
+  hifi.save();
 
   return pool;
 }
@@ -81,12 +74,12 @@ export function createVault(id: string, createTime: BigInt): Vault {
   return vault;
 }
 
-export function loadOrCreateAmm(): Amm {
-  let amm: Amm | null = Amm.load(SINGLETON_INDEX);
-  if (amm == null) {
-    amm = createAmm();
+export function loadOrCreateHifi(): Hifi {
+  let hifi: Hifi | null = Hifi.load(SINGLETON_INDEX);
+  if (hifi == null) {
+    hifi = createHifi();
   }
-  return amm as Amm;
+  return hifi as Hifi;
 }
 
 export function loadOrCreatePool(id: string): Pool {
@@ -111,14 +104,6 @@ export function loadOrCreateTokenBalance(account: Address, token: Address): Toke
     tokenBalance = createTokenBalance(account, token);
   }
   return tokenBalance as TokenBalance;
-}
-
-export function loadOrCreateCore(): Core {
-  let core: Core | null = Core.load(SINGLETON_INDEX);
-  if (core == null) {
-    core = createCore();
-  }
-  return core as Core;
 }
 
 export function loadOrCreateVault(id: string, createTime: BigInt): Vault {

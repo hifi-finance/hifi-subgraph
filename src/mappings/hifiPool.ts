@@ -13,10 +13,11 @@ import {
 } from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
+  let contract: HifiPool = HifiPool.bind(event.address);
   let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.plus(
-    normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar)),
+    normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar())),
   );
   pool.hTokenReserve = pool.hTokenReserve.plus(normalize(event.params.hTokenAmount));
 
@@ -24,10 +25,11 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
+  let contract: HifiPool = HifiPool.bind(event.address);
   let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.minus(
-    normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar)),
+    normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar())),
   );
   pool.hTokenReserve = pool.hTokenReserve.minus(normalize(event.params.hTokenAmount));
 
@@ -35,10 +37,11 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 }
 
 export function handleTrade(event: Trade): void {
+  let contract: HifiPool = HifiPool.bind(event.address);
   let pool = loadOrCreatePool(event.address.toHex());
   let swap = new Swap(event.transaction.hash.toHex());
 
-  let underlyingAmount = normalize(event.params.underlyingAmount.times(pool.underlyingPrecisionScalar));
+  let underlyingAmount = normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()));
   let hTokenAmount = normalize(event.params.hTokenAmount);
   let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
   let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
@@ -49,7 +52,7 @@ export function handleTrade(event: Trade): void {
   let a: f64 = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
   let b: f64 = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
   let c: f64 = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
-  let newUnderlyingReserveWithoutFee: f64 = Math.pow(a + b - c, parseFloat("1") / oneMinusT);
+  let newUnderlyingReserveWithoutFee: f64 = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
   let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
 
   swap.from = event.params.from;
