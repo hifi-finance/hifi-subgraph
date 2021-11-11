@@ -3,7 +3,7 @@
 Hifi is a fixed-rate, fixed-term lending protocol built on the Ethereum blockchain. This subgraph indexes the events
 emitted by our smart contracts.
 
-You can interact with the subgraph via The Graph's [hosted service](https://thegraph.com/explorer/subgraph/hifi-finance/hifi).
+You can interact with the subgraph via The Graph's [hosted service](https://thegraph.com/legacy-explorer/subgraph/hifi-finance/hifi-v1).
 
 ## Queries
 
@@ -12,28 +12,27 @@ that is queryable, but there are many other filtering options that can be used, 
 
 You can also see the saved queries on the hosted service for examples.
 
-### Accounts
+### Vaults
 
 ```graphql
 {
-  accounts(first: 5) {
+  vaults(first: 5) {
     id
-    accountFyTokens {
+    createTime
+    collaterals {
       id
-      fyTokenBalance
-      totalFyTokenBorrowed
-      totalFyTokenRedeemed
-      totalFyTokenRepaid
-      totalUnderlyingSupplied
-      vault {
+      amount
+      token {
         id
-        debt
-        freeCollateral
-        lockedCollateral
       }
     }
-    countLiquidated
-    countLiquidator
+    debts {
+      id
+      amount
+      token {
+        id
+      }
+    }
   }
 }
 ```

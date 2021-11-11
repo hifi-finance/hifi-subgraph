@@ -1,59 +1,54 @@
-import { log } from "@graphprotocol/graph-ts";
-
+import { loadOrCreateHifi } from "../helpers";
 import {
-  ListBond as ListBondEvent,
-  SetBondCollateralizationRatio as SetBondCollateralizationRatioEvent,
-  SetBondDebtCeiling as SetBondDebtCeilingEvent,
-  SetLiquidationIncentive as SetLiquidationIncentiveEvent,
-  SetOracle as SetOracleEvent,
+  ListBond,
+  ListCollateral,
+  SetBorrowAllowed,
+  SetCollateralCeiling,
+  SetDebtCeiling,
+  SetDepositCollateralAllowed,
+  SetLiquidateBorrowAllowed,
+  SetLiquidationIncentive,
+  SetMaxBonds,
+  SetRedeemHTokensAllowed,
+  SetRepayBorrowAllowed,
+  SetSupplyUnderlyingAllowed,
+  TransferOwnership,
 } from "../types/Fintroller/Fintroller";
-import { Fintroller, FyToken } from "../types/schema";
-import { createFyToken, loadOrCreateFintroller } from "../helpers/database";
-import { mantissaBd } from "../helpers/constants";
 
-export function handleListBond(event: ListBondEvent): void {
-  loadOrCreateFintroller();
-
-  // Create the FyToken entity.
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  if (fyToken != null) {
-    log.error("FyToken entity expected to be null when listing bond: {}", [fyTokenId]);
-    return;
-  }
-  fyToken = createFyToken(fyTokenId);
+export function handleListBond(event: ListBond): void {
+  let hifi = loadOrCreateHifi();
+  let listedBonds = hifi.listedBonds;
+  listedBonds.push(event.params.bond);
+  hifi.listedBonds = listedBonds;
+  hifi.save();
 }
 
-export function handleSetBondCollateralizationRatio(event: SetBondCollateralizationRatioEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  if (fyToken == null) {
-    log.error("FyToken entity expected to be exist when setting the collateralization ratio: {}", [fyTokenId]);
-    return;
-  }
-  fyToken.collateralizationRatio = event.params.newCollateralizationRatio.toBigDecimal().div(mantissaBd);
-  fyToken.save();
+export function handleListCollateral(event: ListCollateral): void {
+  let hifi = loadOrCreateHifi();
+  let listedCollaterals = hifi.listedCollaterals;
+  listedCollaterals.push(event.params.collateral);
+  hifi.listedCollaterals = listedCollaterals;
+  hifi.save();
 }
 
-export function handleSetBondDebtCeiling(event: SetBondDebtCeilingEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  if (fyToken == null) {
-    log.error("FyToken entity expected to be exist when setting the debt ceiling: {}", [fyTokenId]);
-    return;
-  }
-  fyToken.debtCeiling = event.params.newDebtCeiling.toBigDecimal().div(mantissaBd);
-  fyToken.save();
-}
+export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
 
-export function handleSetLiquidationIncentive(event: SetLiquidationIncentiveEvent): void {
-  let fintroller: Fintroller = loadOrCreateFintroller();
-  fintroller.liquidationIncentiveMantissa = event.params.newLiquidationIncentive;
-  fintroller.save();
-}
+export function handleSetCollateralCeiling(event: SetCollateralCeiling): void {}
 
-export function handleSetOracle(event: SetOracleEvent): void {
-  let fintroller: Fintroller = loadOrCreateFintroller();
-  fintroller.oracle = event.params.newOracle;
-  fintroller.save();
-}
+export function handleSetDebtCeiling(event: SetDebtCeiling): void {}
+
+export function handleSetDepositCollateralAllowed(event: SetDepositCollateralAllowed): void {}
+
+export function handleSetLiquidateBorrowAllowed(event: SetLiquidateBorrowAllowed): void {}
+
+export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {}
+
+export function handleSetMaxBonds(event: SetMaxBonds): void {}
+
+export function handleSetRedeemHTokensAllowed(event: SetRedeemHTokensAllowed): void {}
+
+export function handleSetRepayBorrowAllowed(event: SetRepayBorrowAllowed): void {}
+
+export function handleSetSupplyUnderlyingAllowed(event: SetSupplyUnderlyingAllowed): void {}
+
+export function handleTransferOwnership(event: TransferOwnership): void {}

@@ -13,30 +13,37 @@ dataSources:
       startBlock: {{contracts.balanceSheet.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
-      file: ./src/mappings/balanceSheet.ts
-      language: wasm/assemblyscript
+      apiVersion: 0.0.5
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: BalanceSheet
-          file: ./abis/BalanceSheet.json
+          file: ./abis/BalanceSheetV1.json
       entities:
-        - Account
-        - Vault
+        - Borrow
+        - DepositCollateral
+        - LiquidateBorrow
+        - RepayBorrow
+        - SetOracle
+        - TransferOwnership
+        - WithdrawCollateral
       eventHandlers:
-        - event: ClutchCollateral(indexed address,indexed address,indexed address,uint256)
-          handler: handleClutchCollateral
+        - event: Borrow(indexed address,indexed address,uint256)
+          handler: handleBorrow
         - event: DepositCollateral(indexed address,indexed address,uint256)
           handler: handleDepositCollateral
-        - event: FreeCollateral(indexed address,indexed address,uint256)
-          handler: handleFreeCollateral
-        - event: LockCollateral(indexed address,indexed address,uint256)
-          handler: handleLockCollateral
-        - event: OpenVault(indexed address,indexed address)
-          handler: handleOpenVault
-        - event: SetVaultDebt(indexed address,indexed address,uint256,uint256)
-          handler: handleSetVaultDebt
+        - event: LiquidateBorrow(indexed address,indexed address,indexed address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+        - event: RepayBorrow(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: SetOracle(indexed address,address,address)
+          handler: handleSetOracle
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
         - event: WithdrawCollateral(indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
+      file: ./src/mappings/balanceSheet.ts
+      language: wasm/assemblyscript
   - kind: ethereum/contract
     name: Fintroller
     network: {{network}}
@@ -46,93 +53,158 @@ dataSources:
       startBlock: {{contracts.fintroller.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
-      file: ./src/mappings/fintroller.ts
-      language: wasm/assemblyscript
+      apiVersion: 0.0.5
       abis:
-        - name: Erc20
-          file: ./abis/Erc20.json
         - name: Fintroller
-          file: ./abis/Fintroller.json
-        - name: FyToken
-          file: ./abis/FyToken.json
-        - name: RedemptionPool
-          file: ./abis/RedemptionPool.json
+          file: ./abis/FintrollerV1.json
       entities:
-        - Fintroller
-        - FyToken
-        - RedemptionPool
+        - ListBond
+        - ListCollateral
+        - SetBorrowAllowed
+        - SetCollateralCeiling
+        - SetDebtCeiling
+        - SetDepositCollateralAllowed
+        - SetLiquidateBorrowAllowed
+        - SetLiquidationIncentive
+        - SetMaxBonds
+        - SetRedeemHTokensAllowed
+        - SetRepayBorrowAllowed
+        - SetSupplyUnderlyingAllowed
+        - TransferOwnership
       eventHandlers:
         - event: ListBond(indexed address,indexed address)
           handler: handleListBond
-        - event: SetBondCollateralizationRatio(indexed address,indexed address,uint256,uint256)
-          handler: handleSetBondCollateralizationRatio
-        - event: SetBondDebtCeiling(indexed address,indexed address,uint256,uint256)
-          handler: handleSetBondDebtCeiling
-        - event: SetLiquidationIncentive(indexed address,uint256,uint256)
+        - event: ListCollateral(indexed address,indexed address)
+          handler: handleListCollateral
+        - event: SetBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetBorrowAllowed
+        - event: SetCollateralCeiling(indexed address,indexed address,uint256,uint256)
+          handler: handleSetCollateralCeiling
+        - event: SetDebtCeiling(indexed address,indexed address,uint256,uint256)
+          handler: handleSetDebtCeiling
+        - event: SetDepositCollateralAllowed(indexed address,indexed address,bool)
+          handler: handleSetDepositCollateralAllowed
+        - event: SetLiquidateBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetLiquidateBorrowAllowed
+        - event: SetLiquidationIncentive(indexed address,address,uint256,uint256)
           handler: handleSetLiquidationIncentive
-        - event: SetOracle(indexed address,address,address)
-          handler: handleSetOracle
-templates:
+        - event: SetMaxBonds(indexed address,uint256,uint256)
+          handler: handleSetMaxBonds
+        - event: SetRedeemHTokensAllowed(indexed address,indexed address,bool)
+          handler: handleSetRedeemHTokensAllowed
+        - event: SetRepayBorrowAllowed(indexed address,indexed address,bool)
+          handler: handleSetRepayBorrowAllowed
+        - event: SetSupplyUnderlyingAllowed(indexed address,indexed address,bool)
+          handler: handleSetSupplyUnderlyingAllowed
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
+      file: ./src/mappings/fintroller.ts
+      language: wasm/assemblyscript
   - kind: ethereum/contract
-    name: FyToken
+    name: HifiPoolRegistry
     network: {{network}}
     source:
-      abi: FyToken
+      abi: HifiPoolRegistry
+      address: "{{contracts.hifiPoolRegistry.address}}"
+      startBlock: {{contracts.hifiPoolRegistry.startBlock}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
-      file: ./src/mappings/fyToken.ts
+      apiVersion: 0.0.5
+      abis:
+        - name: HifiPool
+          file: ./abis/HifiPool.json
+        - name: HifiPoolRegistry
+          file: ./abis/HifiPoolRegistry.json
+      entities:
+        - TrackPool
+        - TransferOwnership
+        - UntrackPool
+      eventHandlers:
+        - event: TrackPool(indexed address)
+          handler: handleTrackPool
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
+        - event: UntrackPool(indexed address)
+          handler: handleUntrackPool
+      file: ./src/mappings/hifiPoolRegistry.ts
       language: wasm/assemblyscript
+templates:
+  - kind: ethereum/contract
+    name: HToken
+    network: {{network}}
+    source:
+      abi: HToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      abis:
+        - name: HToken
+          file: ./abis/HToken.json
+      entities:
+        - Approval
+        - Burn
+        - Mint
+        - Recover
+        - Redeem
+        - SetBalanceSheet
+        - SetNonRecoverableTokens
+        - SupplyUnderlying
+        - Transfer
+        - TransferOwnership
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Burn(indexed address,uint256)
+          handler: handleBurn
+        - event: Mint(indexed address,uint256)
+          handler: handleMint
+        - event: Recover(indexed address,address,uint256)
+          handler: handleRecover
+        - event: Redeem(indexed address,uint256,uint256)
+          handler: handleRedeem
+        - event: SetBalanceSheet(indexed address,address,address)
+          handler: handleSetBalanceSheet
+        - event: SetNonRecoverableTokens(indexed address,address[])
+          handler: handleSetNonRecoverableTokens
+        - event: SupplyUnderlying(indexed address,uint256,uint256)
+          handler: handleSupplyUnderlying
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: TransferOwnership(indexed address,indexed address)
+          handler: handleTransferOwnership
+      file: ./src/mappings/htoken.ts
+      language: wasm/assemblyscript
+  - kind: ethereum/contract
+    name: HifiPool
+    network: {{network}}
+    source:
+      abi: HifiPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
       abis:
         - name: Erc20
           file: ./abis/Erc20.json
-        - name: FyToken
-          file: ./abis/FyToken.json
+        - name: ChainlinkOperator
+          file: ./abis/ChainlinkOperator.json
+        - name: HifiPool
+          file: ./abis/HifiPool.json
       entities:
-        - Account
-        - AccountFyToken
-        - AccountFyTokenTransaction
-        - BorrowEvent
-        - BurnEvent
-        - FyTokenTransferEvent
-        - LiquidateBorrowEvent
-        - MintEvent
-        - RepayBorrowEvent
-        - Token
+        - AddLiquidity
+        - Approval
+        - RemoveLiquidity
+        - Trade
+        - Transfer
       eventHandlers:
-        - event: Borrow(indexed address,uint256)
-          handler: handleBorrow
-        - event: Burn(indexed address,uint256)
-          handler: handleBurn
-        - event: LiquidateBorrow(indexed address,indexed address,uint256,uint256)
-          handler: handleLiquidateBorrow
-        - event: Mint(indexed address,uint256)
-          handler: handleMint
-        - event: RepayBorrow(indexed address,indexed address,uint256,uint256)
-          handler: handleRepayBorrow
+        - event: AddLiquidity(uint256,indexed address,uint256,uint256,uint256)
+          handler: handleAddLiquidity
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: RemoveLiquidity(uint256,indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidity
+        - event: Trade(uint256,indexed address,indexed address,int256,int256)
+          handler: handleTrade
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-  - kind: ethereum/contract
-    name: RedemptionPool
-    network: {{network}}
-    source:
-      abi: RedemptionPool
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.4
-      file: ./src/mappings/redemptionPool.ts
+      file: ./src/mappings/hifiPool.ts
       language: wasm/assemblyscript
-      abis:
-        - name: RedemptionPool
-          file: ./abis/RedemptionPool.json
-      entities:
-        - Account
-        - AccountFyToken
-        - AccountFyTokenTransaction
-        - RedemptionPool
-      eventHandlers:
-        - event: RedeemFyTokens(indexed address,uint256,uint256)
-          handler: handleRedeemFyTokens
-        - event: SupplyUnderlying(indexed address,uint256,uint256)
-          handler: handleSupplyUnderlying

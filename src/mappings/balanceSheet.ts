@@ -1,147 +1,80 @@
-import { BigDecimal, log } from "@graphprotocol/graph-ts";
-
+import { loadOrCreateHifi, loadOrCreatePosition, loadOrCreateToken, loadOrCreateVault, normalize } from "../helpers";
 import {
-  ClutchCollateral as ClutchCollateralEvent,
-  DepositCollateral as DepositCollateralEvent,
-  FreeCollateral as FreeCollateralEvent,
-  LockCollateral as LockCollateralEvent,
-  OpenVault as OpenVaultEvent,
-  SetVaultDebt as SetVaultDebtEvent,
-  WithdrawCollateral as WithdrawCollateralEvent,
+  Borrow,
+  DepositCollateral,
+  LiquidateBorrow,
+  RepayBorrow,
+  SetOracle,
+  TransferOwnership,
+  WithdrawCollateral,
 } from "../types/BalanceSheet/BalanceSheet";
-import { FyToken, Token, Vault } from "../types/schema";
-import { createVault, getAccountFyTokenId, loadOrCreateFintroller, loadOrCreateFyToken } from "../helpers/database";
-import { mantissaBd } from "../helpers/constants";
-import { scaleTokenAmount } from "../helpers/math";
 
-export function handleClutchCollateral(event: ClutchCollateralEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let borrowerId: string = event.params.borrower.toHexString();
+export function handleBorrow(event: Borrow): void {
+  let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
+  let debts = vault.debts;
+  let debt = loadOrCreatePosition(event.params.account, event.params.bond);
+  debt.amount = debt.amount.plus(normalize(event.params.borrowAmount, loadOrCreateToken(debt.token).decimals));
+  debt.save();
+  debts.push(debt.id);
+  vault.debts = debts;
+  vault.save();
+}
 
-  let vaultId: string = getAccountFyTokenId(borrowerId, fyTokenId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when clutching collateral: {}-{}", [fyTokenId, borrowerId]);
-    return;
-  }
-
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateralId: string = fyToken.collateral;
-  let collateral: Token | null = Token.load(collateralId);
-  let clutchedCollateralAmountBd: BigDecimal = scaleTokenAmount(
-    event.params.clutchedCollateralAmount,
-    collateral.decimals,
+export function handleDepositCollateral(event: DepositCollateral): void {
+  let hifi = loadOrCreateHifi();
+  let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
+  let collaterals = vault.collaterals;
+  let collateral = loadOrCreatePosition(event.params.account, event.params.collateral);
+  collateral.amount = collateral.amount.plus(
+    normalize(event.params.collateralAmount, loadOrCreateToken(collateral.token).decimals),
   );
-  vault.lockedCollateral = vault.lockedCollateral.minus(clutchedCollateralAmountBd);
+  collateral.save();
+  collaterals.push(collateral.id);
+  vault.collaterals = collaterals;
+  vault.save();
+  let vaults = hifi.vaults;
+  vaults.push(vault.id);
+  hifi.vaults = vaults;
+  hifi.save();
+}
+
+export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
+  let collaterals = vault.collaterals;
+  let collateral = loadOrCreatePosition(event.params.borrower, event.params.collateral);
+  collateral.amount = collateral.amount.minus(
+    normalize(event.params.seizedCollateralAmount, loadOrCreateToken(collateral.token).decimals),
+  );
+  collateral.save();
+  collaterals.push(collateral.id);
+  vault.collaterals = collaterals;
   vault.save();
 }
 
-export function handleDepositCollateral(event: DepositCollateralEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let accountId: string = event.params.borrower.toHexString();
-
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when depositing collateral: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
-
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateralId: string = fyToken.collateral;
-  let collateral: Token | null = Token.load(collateralId);
-  let collateralAmountBd: BigDecimal = scaleTokenAmount(event.params.collateralAmount, collateral.decimals);
-  vault.freeCollateral = vault.freeCollateral.plus(collateralAmountBd);
+export function handleRepayBorrow(event: RepayBorrow): void {
+  let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
+  let debts = vault.debts;
+  let debt = loadOrCreatePosition(event.params.borrower, event.params.bond);
+  debt.amount = debt.amount.minus(normalize(event.params.repayAmount, loadOrCreateToken(debt.token).decimals));
+  debt.save();
+  debts.push(debt.id);
+  vault.debts = debts;
   vault.save();
 }
 
-export function handleFreeCollateral(event: FreeCollateralEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let accountId: string = event.params.borrower.toHexString();
+export function handleSetOracle(event: SetOracle): void {}
 
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when freeing collateral: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
+export function handleTransferOwnership(event: TransferOwnership): void {}
 
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateralId: string = fyToken.collateral;
-  let collateral: Token | null = Token.load(collateralId);
-  let collateralAmountBd: BigDecimal = scaleTokenAmount(event.params.collateralAmount, collateral.decimals);
-  vault.freeCollateral = vault.freeCollateral.plus(collateralAmountBd);
-  vault.lockedCollateral = vault.lockedCollateral.minus(collateralAmountBd);
-  vault.save();
-}
-
-export function handleLockCollateral(event: LockCollateralEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let accountId: string = event.params.borrower.toHexString();
-
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when locking collateral: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
-
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateralId: string = fyToken.collateral;
-  let collateral: Token | null = Token.load(collateralId);
-  let collateralAmountBd: BigDecimal = scaleTokenAmount(event.params.collateralAmount, collateral.decimals);
-  vault.freeCollateral = vault.freeCollateral.minus(collateralAmountBd);
-  vault.lockedCollateral = vault.lockedCollateral.plus(collateralAmountBd);
-  vault.save();
-}
-
-export function handleOpenVault(event: OpenVaultEvent): void {
-  loadOrCreateFintroller();
-
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  loadOrCreateFyToken(fyTokenId);
-
-  let accountId: string = event.params.borrower.toHexString();
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault != null) {
-    log.error("Vault entity expected to be null when opened: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
-  createVault(fyTokenId, accountId);
-}
-
-export function handleSetVaultDebt(event: SetVaultDebtEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let accountId: string = event.params.borrower.toHexString();
-
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when the debt is set: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
-
-  let newDebtBd: BigDecimal = event.params.newDebt.toBigDecimal().div(mantissaBd);
-  vault.debt = newDebtBd;
-  vault.save();
-}
-
-export function handleWithdrawCollateral(event: WithdrawCollateralEvent): void {
-  let fyTokenId: string = event.params.fyToken.toHexString();
-  let accountId: string = event.params.borrower.toHexString();
-
-  let vaultId: string = getAccountFyTokenId(fyTokenId, accountId);
-  let vault: Vault | null = Vault.load(vaultId);
-  if (vault == null) {
-    log.error("Vault entity expected to exist when withdrawing collateral: {}-{}", [fyTokenId, accountId]);
-    return;
-  }
-
-  let fyToken: FyToken | null = FyToken.load(fyTokenId);
-  let collateralId: string = fyToken.collateral;
-  let collateral: Token | null = Token.load(collateralId);
-  let collateralAmountBd: BigDecimal = scaleTokenAmount(event.params.collateralAmount, collateral.decimals);
-  vault.freeCollateral = vault.freeCollateral.minus(collateralAmountBd);
+export function handleWithdrawCollateral(event: WithdrawCollateral): void {
+  let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
+  let collaterals = vault.collaterals;
+  let collateral = loadOrCreatePosition(event.params.account, event.params.collateral);
+  collateral.amount = collateral.amount.minus(
+    normalize(event.params.collateralAmount, loadOrCreateToken(collateral.token).decimals),
+  );
+  collateral.save();
+  collaterals.push(collateral.id);
+  vault.collaterals = collaterals;
   vault.save();
 }
