@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { store } from "@graphprotocol/graph-ts";
 
-import { Hifi, Pool, Token, TokenBalance, Vault } from "../types/schema";
+import { Hifi, Pool, Position, Token, Vault } from "../types/schema";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
@@ -47,6 +47,14 @@ export function createPool(id: string): Pool {
   return pool;
 }
 
+export function createPosition(account: Address, token: Address): Position {
+  let position: Position = new Position(getAccountTokenId(account.toHex(), token.toHex()));
+  position.amount = BigInt.fromI32(0).toBigDecimal();
+  position.token = loadOrCreateToken(token.toHexString()).id;
+  position.save();
+  return position;
+}
+
 export function createToken(id: string): Token {
   let token: Token = new Token(id);
   let erc20: Erc20Contract = Erc20Contract.bind(Address.fromString(id));
@@ -55,14 +63,6 @@ export function createToken(id: string): Token {
   token.symbol = erc20.symbol();
   token.save();
   return token;
-}
-
-export function createTokenBalance(account: Address, token: Address): TokenBalance {
-  let tokenBalance: TokenBalance = new TokenBalance(getAccountTokenId(account.toHex(), token.toHex()));
-  tokenBalance.amount = BigInt.fromI32(0).toBigDecimal();
-  tokenBalance.token = loadOrCreateToken(token.toHexString()).id;
-  tokenBalance.save();
-  return tokenBalance;
 }
 
 export function createVault(id: string, createTime: BigInt): Vault {
@@ -90,20 +90,20 @@ export function loadOrCreatePool(id: string): Pool {
   return pool as Pool;
 }
 
+export function loadOrCreatePosition(account: Address, token: Address): Position {
+  let position: Position | null = Position.load(getAccountTokenId(account.toHex(), token.toHex()));
+  if (position == null) {
+    position = createPosition(account, token);
+  }
+  return position as Position;
+}
+
 export function loadOrCreateToken(tokenId: string): Token {
   let token: Token | null = Token.load(tokenId);
   if (token == null) {
     token = createToken(tokenId);
   }
   return token as Token;
-}
-
-export function loadOrCreateTokenBalance(account: Address, token: Address): TokenBalance {
-  let tokenBalance: TokenBalance | null = TokenBalance.load(getAccountTokenId(account.toHex(), token.toHex()));
-  if (tokenBalance == null) {
-    tokenBalance = createTokenBalance(account, token);
-  }
-  return tokenBalance as TokenBalance;
 }
 
 export function loadOrCreateVault(id: string, createTime: BigInt): Vault {

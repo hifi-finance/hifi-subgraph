@@ -1,6 +1,18 @@
 ### GENERIC TYPES ***
 
 """
+Represents a collateral or debt position.
+"""
+type Position @entity {
+  "User Ethereum address concatenated with token contract address"
+  id: ID!
+  "Token amount"
+  amount: BigDecimal!
+  "Token details"
+  token: Token!
+}
+
+"""
 Represents a basic ERC20 token.
 """
 type Token @entity {
@@ -15,19 +27,7 @@ type Token @entity {
 }
 
 """
-Represents a token amount.
-"""
-type TokenBalance @entity {
-  "User Ethereum address concatenated with token contract address"
-  id: ID!
-  "Token amount"
-  amount: BigDecimal!
-  "Token details"
-  token: Token!
-}
-
-"""
-Stores high-level variables.
+High-level overview.
 """
 type Hifi @entity {
   "Always set to 1"
@@ -48,12 +48,12 @@ Stores the collaterals deposited by the user, along with the debts.
 type Vault @entity {
   "User Ethereum address"
   id: ID!
-  "Collateral deposited"
-  collaterals: [TokenBalance!]!
+  "Collaterals deposited"
+  collaterals: [Position!]!
   "Creation block timestamp"
   createTime: BigInt!
   "Debts owed by the vault owner"
-  debts: [TokenBalance!]!
+  debts: [Position!]!
 }
 
 """
