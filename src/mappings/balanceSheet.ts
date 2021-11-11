@@ -4,8 +4,6 @@ import {
   DepositCollateral,
   LiquidateBorrow,
   RepayBorrow,
-  SetOracle,
-  TransferOwnership,
   WithdrawCollateral,
 } from "../types/BalanceSheet/BalanceSheet";
 
@@ -62,9 +60,9 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   vault.save();
 }
 
-export function handleSetOracle(event: SetOracle): void {}
+// export function handleSetOracle(event: SetOracle): void {}
 
-export function handleTransferOwnership(event: TransferOwnership): void {}
+// export function handleTransferOwnership(event: TransferOwnership): void {}
 
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);

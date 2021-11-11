@@ -1,19 +1,5 @@
 import { loadOrCreateHifi } from "../helpers";
-import {
-  ListBond,
-  ListCollateral,
-  SetBorrowAllowed,
-  SetCollateralCeiling,
-  SetDebtCeiling,
-  SetDepositCollateralAllowed,
-  SetLiquidateBorrowAllowed,
-  SetLiquidationIncentive,
-  SetMaxBonds,
-  SetRedeemHTokensAllowed,
-  SetRepayBorrowAllowed,
-  SetSupplyUnderlyingAllowed,
-  TransferOwnership,
-} from "../types/Fintroller/Fintroller";
+import { ListBond, ListCollateral } from "../types/Fintroller/Fintroller";
 
 export function handleListBond(event: ListBond): void {
   let hifi = loadOrCreateHifi();
@@ -31,24 +17,24 @@ export function handleListCollateral(event: ListCollateral): void {
   hifi.save();
 }
 
-export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
+// export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
 
-export function handleSetCollateralCeiling(event: SetCollateralCeiling): void {}
+// export function handleSetCollateralCeiling(event: SetCollateralCeiling): void {}
 
-export function handleSetDebtCeiling(event: SetDebtCeiling): void {}
+// export function handleSetDebtCeiling(event: SetDebtCeiling): void {}
 
-export function handleSetDepositCollateralAllowed(event: SetDepositCollateralAllowed): void {}
+// export function handleSetDepositCollateralAllowed(event: SetDepositCollateralAllowed): void {}
 
-export function handleSetLiquidateBorrowAllowed(event: SetLiquidateBorrowAllowed): void {}
+// export function handleSetLiquidateBorrowAllowed(event: SetLiquidateBorrowAllowed): void {}
 
-export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {}
+// export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {}
 
-export function handleSetMaxBonds(event: SetMaxBonds): void {}
+// export function handleSetMaxBonds(event: SetMaxBonds): void {}
 
-export function handleSetRedeemHTokensAllowed(event: SetRedeemHTokensAllowed): void {}
+// export function handleSetRedeemHTokensAllowed(event: SetRedeemHTokensAllowed): void {}
 
-export function handleSetRepayBorrowAllowed(event: SetRepayBorrowAllowed): void {}
+// export function handleSetRepayBorrowAllowed(event: SetRepayBorrowAllowed): void {}
 
-export function handleSetSupplyUnderlyingAllowed(event: SetSupplyUnderlyingAllowed): void {}
+// export function handleSetSupplyUnderlyingAllowed(event: SetSupplyUnderlyingAllowed): void {}
 
-export function handleTransferOwnership(event: TransferOwnership): void {}
+// export function handleTransferOwnership(event: TransferOwnership): void {}

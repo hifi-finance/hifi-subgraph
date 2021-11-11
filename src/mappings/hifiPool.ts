@@ -3,14 +3,7 @@ import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { CHAINLINK_OPERATOR_ADDRESS, loadOrCreatePool, loadOrCreateToken, normalize } from "../helpers";
 import { Swap } from "../types/schema";
 import { ChainlinkOperator } from "../types/templates/HifiPool/ChainlinkOperator";
-import {
-  AddLiquidity,
-  Approval,
-  HifiPool,
-  RemoveLiquidity,
-  Trade,
-  Transfer,
-} from "../types/templates/HifiPool/HifiPool";
+import { AddLiquidity, HifiPool, RemoveLiquidity, Trade } from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
   let contract: HifiPool = HifiPool.bind(event.address);
@@ -75,6 +68,6 @@ export function handleTrade(event: Trade): void {
   pool.save();
 }
 
-export function handleApproval(event: Approval): void {}
+// export function handleApproval(event: Approval): void {}
 
-export function handleTransfer(event: Transfer): void {}
+// export function handleTransfer(event: Transfer): void {}
