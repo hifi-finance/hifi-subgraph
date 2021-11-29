@@ -2,20 +2,20 @@
   "network": "matic",
   "contracts": {
     "balanceSheet": {
-      "address": "",
-      "startBlock": 0
+      "address": "0xbB3fE799c020daD36B9dFFEab92CE3674CBA5E7a",
+      "startBlock": 21750239
     },
     "chainlinkOperator": {
-      "address": "",
-      "startBlock": 0
+      "address": "0x4659B60b34591386d6B4EDA1DA1467d05b0E02DE",
+      "startBlock": 21749919
     },
     "fintroller": {
-      "address": "",
-      "startBlock": 0
+      "address": "0x81695eFd9C5D1a13140ccb2d26f01a71BD1F6Fac",
+      "startBlock": 21750153
     },
     "hifiPoolRegistry": {
-      "address": "",
-      "startBlock": 0
+      "address": "0x0215c418c24C4a757aB47035EAc029256f788156",
+      "startBlock": 21750325
     }
   }
 }
