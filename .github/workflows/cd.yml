@@ -25,16 +25,13 @@ jobs:
         run: "yarn run lint"
 
       - name: "Generate subgraph manifest"
-        run: "yarn run prepare:mainnet"
+        run: "yarn run prepare:matic"
 
       - name: "Generate AssemblyScript types"
         run: "yarn run codegen"
 
-      - name: "Deploy to Kovan"
-        run: "yarn run deploy:kovan --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
-
-      - name: "Deploy to Mainnet"
-        run: "yarn run deploy:mainnet --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
+      - name: "Deploy to Matic"
+        run: "yarn run deploy:matic --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
 
       - name: "Deploy to Rinkeby"
         run: "yarn run deploy:rinkeby --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
