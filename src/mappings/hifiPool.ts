@@ -67,7 +67,3 @@ export function handleTrade(event: Trade): void {
 
   pool.save();
 }
-
-// export function handleApproval(event: Approval): void {}
-
-// export function handleTransfer(event: Transfer): void {}

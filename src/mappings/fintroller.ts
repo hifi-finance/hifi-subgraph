@@ -16,25 +16,3 @@ export function handleListCollateral(event: ListCollateral): void {
   hifi.listedCollaterals = listedCollaterals;
   hifi.save();
 }
-
-// export function handleSetBorrowAllowed(event: SetBorrowAllowed): void {}
-
-// export function handleSetCollateralCeiling(event: SetCollateralCeiling): void {}
-
-// export function handleSetDebtCeiling(event: SetDebtCeiling): void {}
-
-// export function handleSetDepositCollateralAllowed(event: SetDepositCollateralAllowed): void {}
-
-// export function handleSetLiquidateBorrowAllowed(event: SetLiquidateBorrowAllowed): void {}
-
-// export function handleSetLiquidationIncentive(event: SetLiquidationIncentive): void {}
-
-// export function handleSetMaxBonds(event: SetMaxBonds): void {}
-
-// export function handleSetRedeemHTokensAllowed(event: SetRedeemHTokensAllowed): void {}
-
-// export function handleSetRepayBorrowAllowed(event: SetRepayBorrowAllowed): void {}
-
-// export function handleSetSupplyUnderlyingAllowed(event: SetSupplyUnderlyingAllowed): void {}
-
-// export function handleTransferOwnership(event: TransferOwnership): void {}

@@ -36,10 +36,6 @@ dataSources:
           handler: handleLiquidateBorrow
         - event: RepayBorrow(indexed address,indexed address,indexed address,uint256,uint256)
           handler: handleRepayBorrow
-        # - event: SetOracle(indexed address,address,address)
-        #   handler: handleSetOracle
-        # - event: TransferOwnership(indexed address,indexed address)
-        #   handler: handleTransferOwnership
         - event: WithdrawCollateral(indexed address,indexed address,uint256)
           handler: handleWithdrawCollateral
       file: ./src/mappings/balanceSheet.ts
@@ -76,28 +72,6 @@ dataSources:
           handler: handleListBond
         - event: ListCollateral(indexed address,indexed address)
           handler: handleListCollateral
-        # - event: SetBorrowAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetBorrowAllowed
-        # - event: SetCollateralCeiling(indexed address,indexed address,uint256,uint256)
-        #   handler: handleSetCollateralCeiling
-        # - event: SetDebtCeiling(indexed address,indexed address,uint256,uint256)
-        #   handler: handleSetDebtCeiling
-        # - event: SetDepositCollateralAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetDepositCollateralAllowed
-        # - event: SetLiquidateBorrowAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetLiquidateBorrowAllowed
-        # - event: SetLiquidationIncentive(indexed address,address,uint256,uint256)
-        #   handler: handleSetLiquidationIncentive
-        # - event: SetMaxBonds(indexed address,uint256,uint256)
-        #   handler: handleSetMaxBonds
-        # - event: SetRedeemHTokensAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetRedeemHTokensAllowed
-        # - event: SetRepayBorrowAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetRepayBorrowAllowed
-        # - event: SetSupplyUnderlyingAllowed(indexed address,indexed address,bool)
-        #   handler: handleSetSupplyUnderlyingAllowed
-        # - event: TransferOwnership(indexed address,indexed address)
-        #   handler: handleTransferOwnership
       file: ./src/mappings/fintroller.ts
       language: wasm/assemblyscript
   - kind: ethereum/contract
@@ -122,8 +96,6 @@ dataSources:
       eventHandlers:
         - event: TrackPool(indexed address)
           handler: handleTrackPool
-        # - event: TransferOwnership(indexed address,indexed address)
-        #   handler: handleTransferOwnership
         - event: UntrackPool(indexed address)
           handler: handleUntrackPool
       file: ./src/mappings/hifiPoolRegistry.ts
@@ -153,13 +125,9 @@ templates:
       eventHandlers:
         - event: AddLiquidity(uint256,indexed address,uint256,uint256,uint256)
           handler: handleAddLiquidity
-        # - event: Approval(indexed address,indexed address,uint256)
-        #   handler: handleApproval
         - event: RemoveLiquidity(uint256,indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidity
         - event: Trade(uint256,indexed address,indexed address,int256,int256)
           handler: handleTrade
-        # - event: Transfer(indexed address,indexed address,uint256)
-        #   handler: handleTransfer
       file: ./src/mappings/hifiPool.ts
       language: wasm/assemblyscript
