@@ -20,13 +20,10 @@ dataSources:
         - name: BalanceSheet
           file: ./abis/BalanceSheetV1.json
       entities:
-        - Borrow
-        - DepositCollateral
-        - LiquidateBorrow
-        - RepayBorrow
-        - SetOracle
-        - TransferOwnership
-        - WithdrawCollateral
+        - Hifi
+        - Position
+        - Token
+        - Vault
       eventHandlers:
         - event: Borrow(indexed address,indexed address,uint256)
           handler: handleBorrow
@@ -54,19 +51,7 @@ dataSources:
         - name: Fintroller
           file: ./abis/FintrollerV1.json
       entities:
-        - ListBond
-        - ListCollateral
-        - SetBorrowAllowed
-        - SetCollateralCeiling
-        - SetDebtCeiling
-        - SetDepositCollateralAllowed
-        - SetLiquidateBorrowAllowed
-        - SetLiquidationIncentive
-        - SetMaxBonds
-        - SetRedeemHTokensAllowed
-        - SetRepayBorrowAllowed
-        - SetSupplyUnderlyingAllowed
-        - TransferOwnership
+        - Hifi
       eventHandlers:
         - event: ListBond(indexed address,indexed address)
           handler: handleListBond
@@ -90,9 +75,8 @@ dataSources:
         - name: HifiPoolRegistry
           file: ./abis/HifiPoolRegistry.json
       entities:
-        - TrackPool
-        - TransferOwnership
-        - UntrackPool
+        - Hifi
+        - Pool
       eventHandlers:
         - event: TrackPool(indexed address)
           handler: handleTrackPool
@@ -117,11 +101,7 @@ templates:
         - name: HifiPool
           file: ./abis/HifiPool.json
       entities:
-        - AddLiquidity
-        - Approval
-        - RemoveLiquidity
-        - Trade
-        - Transfer
+        - Swap
       eventHandlers:
         - event: AddLiquidity(uint256,indexed address,uint256,uint256,uint256)
           handler: handleAddLiquidity
