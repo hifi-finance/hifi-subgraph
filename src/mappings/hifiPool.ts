@@ -1,6 +1,12 @@
 import { BigDecimal } from "@graphprotocol/graph-ts";
 
-import { chainlinkOperatorAddress, loadOrCreatePool, loadOrCreateToken, scaleTokenAmount } from "../helpers";
+import {
+  chainlinkOperatorAddress,
+  hTokenDecimals,
+  loadOrCreatePool,
+  loadOrCreateToken,
+  scaleTokenAmount,
+} from "../helpers";
 import { Swap } from "../types/schema";
 import { ChainlinkOperator } from "../types/templates/HifiPool/ChainlinkOperator";
 import { AddLiquidity, HifiPool, RemoveLiquidity, Trade } from "../types/templates/HifiPool/HifiPool";
@@ -12,7 +18,7 @@ export function handleAddLiquidity(event: AddLiquidity): void {
   pool.underlyingReserve = pool.underlyingReserve.plus(
     scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
   );
-  pool.hTokenReserve = pool.hTokenReserve.plus(scaleTokenAmount(event.params.hTokenAmount, 18));
+  pool.hTokenReserve = pool.hTokenReserve.plus(scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals));
 
   pool.save();
 }
@@ -24,7 +30,7 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   pool.underlyingReserve = pool.underlyingReserve.minus(
     scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
   );
-  pool.hTokenReserve = pool.hTokenReserve.minus(scaleTokenAmount(event.params.hTokenAmount, 18));
+  pool.hTokenReserve = pool.hTokenReserve.minus(scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals));
 
   pool.save();
 }
@@ -38,17 +44,17 @@ export function handleTrade(event: Trade): void {
     event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()),
     18,
   );
-  let hTokenAmount = scaleTokenAmount(event.params.hTokenAmount, 18);
+  let hTokenAmount = scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals);
   let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
   let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
 
   let totalSupply = scaleTokenAmount(HifiPool.bind(event.address).totalSupply(), 18);
-  let t: f64 = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
-  let oneMinusT: f64 = parseFloat("1") - t;
-  let a: f64 = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
-  let b: f64 = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
-  let c: f64 = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
-  let newUnderlyingReserveWithoutFee: f64 = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
+  let t = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
+  let oneMinusT = parseFloat("1") - t;
+  let a = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
+  let b = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
+  let c = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
+  let newUnderlyingReserveWithoutFee = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
   let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
 
   swap.from = event.params.from;

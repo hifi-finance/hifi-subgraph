@@ -1,4 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
 
-export const defaultHifiId: string = "1";
-export const chainlinkOperatorAddress: Address = Address.fromString("{{contracts.chainlinkOperator.address}}");
+export const defaultHifiId = "1";
+export const chainlinkOperatorAddress = Address.fromString("{{contracts.chainlinkOperator.address}}");
+export const hTokenDecimals = 18;
