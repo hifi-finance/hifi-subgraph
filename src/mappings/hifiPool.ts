@@ -1,6 +1,6 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 
-import { CHAINLINK_OPERATOR_ADDRESS, loadOrCreatePool, loadOrCreateToken, normalize } from "../helpers";
+import { chainlinkOperatorAddress, loadOrCreatePool, loadOrCreateToken, scaleTokenAmount } from "../helpers";
 import { Swap } from "../types/schema";
 import { ChainlinkOperator } from "../types/templates/HifiPool/ChainlinkOperator";
 import { AddLiquidity, HifiPool, RemoveLiquidity, Trade } from "../types/templates/HifiPool/HifiPool";
@@ -10,9 +10,9 @@ export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.plus(
-    normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar())),
+    scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
   );
-  pool.hTokenReserve = pool.hTokenReserve.plus(normalize(event.params.hTokenAmount));
+  pool.hTokenReserve = pool.hTokenReserve.plus(scaleTokenAmount(event.params.hTokenAmount, 18));
 
   pool.save();
 }
@@ -22,9 +22,9 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = loadOrCreatePool(event.address.toHex());
 
   pool.underlyingReserve = pool.underlyingReserve.minus(
-    normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar())),
+    scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
   );
-  pool.hTokenReserve = pool.hTokenReserve.minus(normalize(event.params.hTokenAmount));
+  pool.hTokenReserve = pool.hTokenReserve.minus(scaleTokenAmount(event.params.hTokenAmount, 18));
 
   pool.save();
 }
@@ -34,12 +34,15 @@ export function handleTrade(event: Trade): void {
   let pool = loadOrCreatePool(event.address.toHex());
   let swap = new Swap(event.transaction.hash.toHex());
 
-  let underlyingAmount = normalize(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()));
-  let hTokenAmount = normalize(event.params.hTokenAmount);
+  let underlyingAmount = scaleTokenAmount(
+    event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()),
+    18,
+  );
+  let hTokenAmount = scaleTokenAmount(event.params.hTokenAmount, 18);
   let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
   let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
 
-  let totalSupply = normalize(HifiPool.bind(event.address).totalSupply());
+  let totalSupply = scaleTokenAmount(HifiPool.bind(event.address).totalSupply(), 18);
   let t: f64 = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
   let oneMinusT: f64 = parseFloat("1") - t;
   let a: f64 = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
@@ -51,9 +54,11 @@ export function handleTrade(event: Trade): void {
   swap.from = event.params.from;
   swap.hTokenAmount = hTokenAmount;
   swap.swapFee = BigDecimal.fromString(diff.toString());
-  let chainlinkOperatorContract = ChainlinkOperator.bind(Address.fromString(CHAINLINK_OPERATOR_ADDRESS));
+  let chainlinkOperatorContract = ChainlinkOperator.bind(chainlinkOperatorAddress);
   let underlying = loadOrCreateToken(pool.underlying.toHex());
-  swap.swapFeeUsd = normalize(chainlinkOperatorContract.getNormalizedPrice(underlying.symbol)).times(swap.swapFee);
+  swap.swapFeeUsd = scaleTokenAmount(chainlinkOperatorContract.getNormalizedPrice(underlying.symbol), 18).times(
+    swap.swapFee,
+  );
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
   swap.underlyingAmount = underlyingAmount;

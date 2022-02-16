@@ -5,14 +5,14 @@ import { Hifi, Pool, Position, Token, Vault } from "../types/schema";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
-import { SINGLETON_INDEX } from "./constants";
+import { defaultHifiId } from "./constants";
 
 export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);
 }
 
 export function createHifi(): Hifi {
-  let hifi: Hifi = new Hifi(SINGLETON_INDEX);
+  let hifi: Hifi = new Hifi(defaultHifiId);
   hifi.listedBonds = [];
   hifi.listedCollaterals = [];
   hifi.pools = [];
@@ -75,7 +75,7 @@ export function createVault(id: string, createTime: BigInt): Vault {
 }
 
 export function loadOrCreateHifi(): Hifi {
-  let hifi: Hifi | null = Hifi.load(SINGLETON_INDEX);
+  let hifi: Hifi | null = Hifi.load(defaultHifiId);
   if (hifi == null) {
     hifi = createHifi();
   }

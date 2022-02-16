@@ -1,2 +1,4 @@
-export const SINGLETON_INDEX: string = "1";
-export const CHAINLINK_OPERATOR_ADDRESS: string = "{{contracts.chainlinkOperator.address}}";
+import { Address } from "@graphprotocol/graph-ts";
+
+export const defaultHifiId: string = "1";
+export const chainlinkOperatorAddress: Address = Address.fromString("{{contracts.chainlinkOperator.address}}");
