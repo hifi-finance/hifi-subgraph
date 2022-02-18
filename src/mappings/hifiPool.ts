@@ -59,9 +59,10 @@ export function handleTrade(event: Trade): void {
 
   swap.from = event.params.from;
   swap.hTokenAmount = hTokenAmount;
+  swap.pool = pool.id;
   swap.swapFee = BigDecimal.fromString(diff.toString());
   let chainlinkOperatorContract = ChainlinkOperator.bind(chainlinkOperatorAddress);
-  let underlying = loadOrCreateToken(pool.underlying.toHex());
+  let underlying = loadOrCreateToken(pool.underlying);
   swap.swapFeeUsd = scaleTokenAmount(chainlinkOperatorContract.getNormalizedPrice(underlying.symbol), 18).times(
     swap.swapFee,
   );
@@ -70,9 +71,6 @@ export function handleTrade(event: Trade): void {
   swap.underlyingAmount = underlyingAmount;
   swap.save();
 
-  let swaps = pool.swaps;
-  swaps.push(swap.id);
-  pool.swaps = swaps;
   pool.underlyingReserve = newUnderlyingReserve;
   pool.hTokenReserve = newHTokenReserve;
 

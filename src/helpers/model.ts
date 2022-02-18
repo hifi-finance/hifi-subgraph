@@ -30,11 +30,12 @@ export function createPool(id: string): Pool {
   // Bind the HifiPool contract and read its state.
   let pool: Pool = new Pool(id);
   let contract: HifiPoolContract = HifiPoolContract.bind(hifiPoolAddress);
-  pool.hToken = contract.hToken();
+  let hToken = loadOrCreateToken(contract.hToken().toHex());
+  let underlying = loadOrCreateToken(contract.underlying().toHex());
+  pool.hToken = hToken.id;
   pool.hTokenReserve = zeroBd;
   pool.maturity = contract.maturity();
-  pool.swaps = [];
-  pool.underlying = contract.underlying();
+  pool.underlying = underlying.id;
   pool.underlyingReserve = zeroBd;
   pool.save();
 
@@ -48,10 +49,11 @@ export function createPool(id: string): Pool {
   return pool;
 }
 
-export function createPosition(account: Address, token: Address): Position {
-  let position: Position = new Position(getAccountTokenId(account.toHex(), token.toHex()));
+export function createPosition(account: Address, tokenId: Address): Position {
+  let position: Position = new Position(getAccountTokenId(account.toHex(), tokenId.toHex()));
+  let token = loadOrCreateToken(tokenId.toHex());
   position.amount = zeroBd;
-  position.token = loadOrCreateToken(token.toHexString()).id;
+  position.token = token.id;
   position.save();
   return position;
 }

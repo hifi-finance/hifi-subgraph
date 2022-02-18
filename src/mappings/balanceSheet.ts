@@ -16,10 +16,11 @@ import {
 export function handleBorrow(event: Borrow): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let debts = vault.debts;
-  let debt = loadOrCreatePosition(event.params.account, event.params.bond);
-  debt.amount = debt.amount.plus(scaleTokenAmount(event.params.borrowAmount, loadOrCreateToken(debt.token).decimals));
-  debt.save();
-  debts.push(debt.id);
+  let position = loadOrCreatePosition(event.params.account, event.params.bond);
+  let bond = loadOrCreateToken(position.token);
+  position.amount = position.amount.plus(scaleTokenAmount(event.params.borrowAmount, bond.decimals));
+  position.save();
+  debts.push(position.id);
   vault.debts = debts;
   vault.save();
 }
@@ -28,10 +29,9 @@ export function handleDepositCollateral(event: DepositCollateral): void {
   let hifi = loadOrCreateHifi();
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
-  let collateral = loadOrCreatePosition(event.params.account, event.params.collateral);
-  collateral.amount = collateral.amount.plus(
-    scaleTokenAmount(event.params.collateralAmount, loadOrCreateToken(collateral.token).decimals),
-  );
+  let position = loadOrCreatePosition(event.params.account, event.params.collateral);
+  let collateral = loadOrCreateToken(position.token);
+  position.amount = position.amount.plus(scaleTokenAmount(event.params.collateralAmount, collateral.decimals));
   collateral.save();
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;
@@ -45,10 +45,9 @@ export function handleDepositCollateral(event: DepositCollateral): void {
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
-  let collateral = loadOrCreatePosition(event.params.borrower, event.params.collateral);
-  collateral.amount = collateral.amount.minus(
-    scaleTokenAmount(event.params.seizedCollateralAmount, loadOrCreateToken(collateral.token).decimals),
-  );
+  let position = loadOrCreatePosition(event.params.borrower, event.params.collateral);
+  let collateral = loadOrCreateToken(position.token);
+  position.amount = position.amount.minus(scaleTokenAmount(event.params.seizedCollateralAmount, collateral.decimals));
   collateral.save();
   collaterals.push(collateral.id);
   vault.collaterals = collaterals;
@@ -58,10 +57,11 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 export function handleRepayBorrow(event: RepayBorrow): void {
   let vault = loadOrCreateVault(event.params.borrower.toHex(), event.block.timestamp);
   let debts = vault.debts;
-  let debt = loadOrCreatePosition(event.params.borrower, event.params.bond);
-  debt.amount = debt.amount.minus(scaleTokenAmount(event.params.repayAmount, loadOrCreateToken(debt.token).decimals));
-  debt.save();
-  debts.push(debt.id);
+  let position = loadOrCreatePosition(event.params.borrower, event.params.bond);
+  let bond = loadOrCreateToken(position.token);
+  position.amount = position.amount.minus(scaleTokenAmount(event.params.repayAmount, bond.decimals));
+  bond.save();
+  debts.push(bond.id);
   vault.debts = debts;
   vault.save();
 }
@@ -69,12 +69,11 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   let vault = loadOrCreateVault(event.params.account.toHex(), event.block.timestamp);
   let collaterals = vault.collaterals;
-  let collateral = loadOrCreatePosition(event.params.account, event.params.collateral);
-  collateral.amount = collateral.amount.minus(
-    scaleTokenAmount(event.params.collateralAmount, loadOrCreateToken(collateral.token).decimals),
-  );
-  collateral.save();
-  collaterals.push(collateral.id);
+  let position = loadOrCreatePosition(event.params.account, event.params.collateral);
+  let collateral = loadOrCreateToken(position.token);
+  position.amount = position.amount.minus(scaleTokenAmount(event.params.collateralAmount, collateral.decimals));
+  position.save();
+  collaterals.push(position.id);
   vault.collaterals = collaterals;
   vault.save();
 }

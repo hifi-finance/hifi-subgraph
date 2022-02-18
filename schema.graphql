@@ -33,9 +33,9 @@ type Hifi @entity {
   "Always set to 1"
   id: ID!
   "Array of all listed bonds"
-  listedBonds: [Bytes!]!
+  listedBonds: [Token!]!
   "Array of all listed collaterals"
-  listedCollaterals: [Bytes!]!
+  listedCollaterals: [Token!]!
   "Array of all AMM pools"
   pools: [Pool!]!
   "Array of all user vaults"
@@ -62,16 +62,16 @@ Stores the pool reserves, along with the swaps.
 type Pool @entity {
   "Pool contract address"
   id: ID!
-  "hToken contract address"
-  hToken: Bytes!
+  "HToken in pool"
+  hToken: Token!
   "Pool reserve of hToken"
   hTokenReserve: BigDecimal!
   "The hToken maturity timestamp"
   maturity: BigInt!
   "Array of all pool trades"
-  swaps: [Swap!]!
-  "Underlying token contract address"
-  underlying: Bytes!
+  swaps: [Swap!]! @derivedFrom(field: "pool")
+  "Underlying in pool"
+  underlying: Token!
   "Pool reserve of underlying token"
   underlyingReserve: BigDecimal!
 }
@@ -83,6 +83,8 @@ type Swap @entity {
   from: Bytes!
   "hTokens swapped"
   hTokenAmount: BigDecimal!
+  "Pool where swap occurred"
+  pool: Pool!
   "Fee paid by user for swap (in underlying)"
   swapFee: BigDecimal!
   "Fee paid by user for swap (in USD)"
