@@ -15,10 +15,10 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
-        - name: Erc20
-          file: ./abis/Erc20.json
         - name: BalanceSheet
           file: ./abis/BalanceSheetV1.json
+        - name: Erc20
+          file: ./abis/Erc20.json
       entities:
         - Hifi
         - Position
@@ -48,6 +48,8 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: Fintroller
           file: ./abis/FintrollerV1.json
       entities:
@@ -70,6 +72,8 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: HifiPool
           file: ./abis/HifiPool.json
         - name: HifiPoolRegistry
@@ -94,10 +98,10 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.5
       abis:
-        - name: Erc20
-          file: ./abis/Erc20.json
         - name: ChainlinkOperator
           file: ./abis/ChainlinkOperator.json
+        - name: Erc20
+          file: ./abis/Erc20.json
         - name: HifiPool
           file: ./abis/HifiPool.json
       entities:
