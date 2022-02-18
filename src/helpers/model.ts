@@ -6,6 +6,7 @@ import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
 import { defaultHifiId } from "./constants";
+import { zeroBd } from ".";
 
 export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);
@@ -30,11 +31,11 @@ export function createPool(id: string): Pool {
   let pool: Pool = new Pool(id);
   let contract: HifiPoolContract = HifiPoolContract.bind(hifiPoolAddress);
   pool.hToken = contract.hToken();
-  pool.hTokenReserve = BigInt.fromI32(0).toBigDecimal();
+  pool.hTokenReserve = zeroBd;
   pool.maturity = contract.maturity();
   pool.swaps = [];
   pool.underlying = contract.underlying();
-  pool.underlyingReserve = BigInt.fromI32(0).toBigDecimal();
+  pool.underlyingReserve = zeroBd;
   pool.save();
 
   // Push newly-created pool to the AMM.
@@ -49,7 +50,7 @@ export function createPool(id: string): Pool {
 
 export function createPosition(account: Address, token: Address): Position {
   let position: Position = new Position(getAccountTokenId(account.toHex(), token.toHex()));
-  position.amount = BigInt.fromI32(0).toBigDecimal();
+  position.amount = zeroBd;
   position.token = loadOrCreateToken(token.toHexString()).id;
   position.save();
   return position;
