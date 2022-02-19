@@ -5,8 +5,7 @@ import { Hifi, Pool, Position, Token, Vault } from "../types/schema";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
 import { Erc20 as Erc20Contract } from "../types/templates/HifiPool/Erc20";
 import { HifiPool as HifiPoolContract } from "../types/templates/HifiPool/HifiPool";
-import { defaultHifiId } from "./constants";
-import { zeroBd } from ".";
+import { defaultHifiId, zeroBd } from "./constants";
 
 export function getAccountTokenId(accountId: string, tokenId: string): string {
   return accountId.concat("-").concat(tokenId);
@@ -93,10 +92,10 @@ export function loadOrCreatePool(id: string): Pool {
   return pool as Pool;
 }
 
-export function loadOrCreatePosition(account: Address, token: Address): Position {
-  let position: Position | null = Position.load(getAccountTokenId(account.toHex(), token.toHex()));
+export function loadOrCreatePosition(account: Address, tokenId: Address): Position {
+  let position: Position | null = Position.load(getAccountTokenId(account.toHex(), tokenId.toHex()));
   if (position == null) {
-    position = createPosition(account, token);
+    position = createPosition(account, tokenId);
   }
   return position as Position;
 }

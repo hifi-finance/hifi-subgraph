@@ -32,8 +32,8 @@ export function handleDepositCollateral(event: DepositCollateral): void {
   let position = loadOrCreatePosition(event.params.account, event.params.collateral);
   let collateral = loadOrCreateToken(position.token);
   position.amount = position.amount.plus(scaleTokenAmount(event.params.collateralAmount, collateral.decimals));
-  collateral.save();
-  collaterals.push(collateral.id);
+  position.save();
+  collaterals.push(position.id);
   vault.collaterals = collaterals;
   vault.save();
   let vaults = hifi.vaults;
@@ -48,8 +48,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let position = loadOrCreatePosition(event.params.borrower, event.params.collateral);
   let collateral = loadOrCreateToken(position.token);
   position.amount = position.amount.minus(scaleTokenAmount(event.params.seizedCollateralAmount, collateral.decimals));
-  collateral.save();
-  collaterals.push(collateral.id);
+  position.save();
+  collaterals.push(position.id);
   vault.collaterals = collaterals;
   vault.save();
 }
@@ -60,8 +60,8 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let position = loadOrCreatePosition(event.params.borrower, event.params.bond);
   let bond = loadOrCreateToken(position.token);
   position.amount = position.amount.minus(scaleTokenAmount(event.params.repayAmount, bond.decimals));
-  bond.save();
-  debts.push(bond.id);
+  position.save();
+  debts.push(position.id);
   vault.debts = debts;
   vault.save();
 }
