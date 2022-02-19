@@ -1,5 +1,4 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { store } from "@graphprotocol/graph-ts";
 
 import { Hifi, Pool, Position, Token, Vault } from "../types/schema";
 import { HifiPool as HifiPoolTemplate } from "../types/templates";
@@ -29,8 +28,8 @@ export function createPool(id: string): Pool {
   // Bind the HifiPool contract and read its state.
   let pool: Pool = new Pool(id);
   let contract: HifiPoolContract = HifiPoolContract.bind(hifiPoolAddress);
-  let hToken = loadOrCreateToken(contract.hToken().toHex());
-  let underlying = loadOrCreateToken(contract.underlying().toHex());
+  let hToken = loadOrCreateToken(contract.hToken().toHexString());
+  let underlying = loadOrCreateToken(contract.underlying().toHexString());
   pool.hToken = hToken.id;
   pool.hTokenReserve = zeroBd;
   pool.maturity = contract.maturity();
@@ -49,8 +48,8 @@ export function createPool(id: string): Pool {
 }
 
 export function createPosition(account: Address, tokenId: Address): Position {
-  let position: Position = new Position(getAccountTokenId(account.toHex(), tokenId.toHex()));
-  let token = loadOrCreateToken(tokenId.toHex());
+  let position: Position = new Position(getAccountTokenId(account.toHexString(), tokenId.toHexString()));
+  let token = loadOrCreateToken(tokenId.toHexString());
   position.amount = zeroBd;
   position.token = token.id;
   position.save();
@@ -93,7 +92,7 @@ export function loadOrCreatePool(id: string): Pool {
 }
 
 export function loadOrCreatePosition(account: Address, tokenId: Address): Position {
-  let position: Position | null = Position.load(getAccountTokenId(account.toHex(), tokenId.toHex()));
+  let position: Position | null = Position.load(getAccountTokenId(account.toHexString(), tokenId.toHexString()));
   if (position == null) {
     position = createPosition(account, tokenId);
   }
@@ -114,8 +113,4 @@ export function loadOrCreateVault(id: string, createTime: BigInt): Vault {
     vault = createVault(id, createTime);
   }
   return vault as Vault;
-}
-
-export function removePool(id: string): void {
-  store.remove("Pool", id);
 }

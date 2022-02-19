@@ -1,53 +1,103 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
-import {
-  chainlinkOperatorAddress,
-  hTokenDecimals,
-  loadOrCreatePool,
-  loadOrCreateToken,
-  scaleTokenAmount,
-} from "../helpers";
-import { Swap } from "../types/schema";
+import { chainlinkOperatorAddress, scaleTokenAmount } from "../helpers";
+import { Pool, Swap, Token } from "../types/schema";
 import { ChainlinkOperator } from "../types/templates/HifiPool/ChainlinkOperator";
 import { AddLiquidity, HifiPool, RemoveLiquidity, Trade } from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
-  let contract: HifiPool = HifiPool.bind(event.address);
-  let pool = loadOrCreatePool(event.address.toHex());
+  let poolId: string = event.address.toHexString();
+  let pool: Pool | null = Pool.load(poolId);
+  if (pool == null) {
+    log.critical("Pool entity of id {} expected to exist when adding liquidity to pool", [poolId]);
+    return;
+  }
 
-  pool.underlyingReserve = pool.underlyingReserve.plus(
-    scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
-  );
-  pool.hTokenReserve = pool.hTokenReserve.plus(scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals));
+  let bond: Token | null = Token.load(pool.hToken);
+  if (bond == null) {
+    log.critical("Token entity of id {} expected to exist when adding liquidity to pool {}", [pool.underlying, poolId]);
+    return;
+  }
 
+  let underlying: Token | null = Token.load(pool.underlying);
+  if (underlying == null) {
+    log.critical("Token entity of id {} expected to exist when adding liquidity to pool {}", [pool.underlying, poolId]);
+    return;
+  }
+
+  let hTokenAmount: BigInt = event.params.hTokenAmount;
+  let hTokenAmountBd: BigDecimal = scaleTokenAmount(hTokenAmount, bond.decimals);
+  pool.hTokenReserve = pool.hTokenReserve.plus(hTokenAmountBd);
+  let underlyingAmount: BigInt = event.params.underlyingAmount;
+  let underlyingAmountBd: BigDecimal = scaleTokenAmount(underlyingAmount, underlying.decimals);
+  pool.underlyingReserve = pool.underlyingReserve.plus(underlyingAmountBd);
   pool.save();
 }
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
-  let contract: HifiPool = HifiPool.bind(event.address);
-  let pool = loadOrCreatePool(event.address.toHex());
+  let poolId: string = event.address.toHexString();
+  let pool: Pool | null = Pool.load(poolId);
+  if (pool == null) {
+    log.critical("Pool entity of id {} expected to exist when removing liquidity from pool", [poolId]);
+    return;
+  }
 
-  pool.underlyingReserve = pool.underlyingReserve.minus(
-    scaleTokenAmount(event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()), 18),
-  );
-  pool.hTokenReserve = pool.hTokenReserve.minus(scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals));
+  let bond: Token | null = Token.load(pool.hToken);
+  if (bond == null) {
+    log.critical("Token entity of id {} expected to exist when removing liquidity from pool {}", [
+      pool.underlying,
+      poolId,
+    ]);
+    return;
+  }
 
+  let underlying: Token | null = Token.load(pool.underlying);
+  if (underlying == null) {
+    log.critical("Token entity of id {} expected to exist when removing liquidity from pool {}", [
+      pool.underlying,
+      poolId,
+    ]);
+    return;
+  }
+
+  let hTokenAmount: BigInt = event.params.hTokenAmount;
+  let hTokenAmountBd: BigDecimal = scaleTokenAmount(hTokenAmount, bond.decimals);
+  pool.hTokenReserve = pool.hTokenReserve.minus(hTokenAmountBd);
+  let underlyingAmount: BigInt = event.params.underlyingAmount;
+  let underlyingAmountBd: BigDecimal = scaleTokenAmount(underlyingAmount, underlying.decimals);
+  pool.underlyingReserve = pool.underlyingReserve.minus(underlyingAmountBd);
   pool.save();
 }
 
 export function handleTrade(event: Trade): void {
-  let contract: HifiPool = HifiPool.bind(event.address);
-  let pool = loadOrCreatePool(event.address.toHex());
-  let swap = new Swap(event.transaction.hash.toHex());
+  let poolId: string = event.address.toHexString();
+  let pool: Pool | null = Pool.load(poolId);
+  if (pool == null) {
+    log.critical("Pool entity of id {} expected to exist when trading", [poolId]);
+    return;
+  }
 
-  let underlyingAmount = scaleTokenAmount(
-    event.params.underlyingAmount.times(contract.underlyingPrecisionScalar()),
-    18,
-  );
-  let hTokenAmount = scaleTokenAmount(event.params.hTokenAmount, hTokenDecimals);
-  let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmount);
-  let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmount);
+  let bond: Token | null = Token.load(pool.hToken);
+  if (bond == null) {
+    log.critical("Token entity of id {} expected to exist when trading in pool {}", [pool.underlying, poolId]);
+    return;
+  }
 
+  let underlying: Token | null = Token.load(pool.underlying);
+  if (underlying == null) {
+    log.critical("Token entity of id {} expected to exist when trading in pool {}", [pool.underlying, poolId]);
+    return;
+  }
+
+  let swapId: string = event.transaction.hash.toHexString();
+  let swap: Swap = new Swap(swapId);
+
+  let hTokenAmount: BigInt = event.params.hTokenAmount;
+  let hTokenAmountBd: BigDecimal = scaleTokenAmount(hTokenAmount, bond.decimals);
+  let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmountBd);
+  let underlyingAmount: BigInt = event.params.underlyingAmount;
+  let underlyingAmountBd: BigDecimal = scaleTokenAmount(underlyingAmount, underlying.decimals);
+  let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmountBd);
   let totalSupply = scaleTokenAmount(HifiPool.bind(event.address).totalSupply(), 18);
   let t = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
   let oneMinusT = parseFloat("1") - t;
@@ -56,23 +106,20 @@ export function handleTrade(event: Trade): void {
   let c = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
   let newUnderlyingReserveWithoutFee = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
   let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
-
   swap.from = event.params.from;
-  swap.hTokenAmount = hTokenAmount;
+  swap.hTokenAmount = hTokenAmountBd;
   swap.pool = pool.id;
   swap.swapFee = BigDecimal.fromString(diff.toString());
   let chainlinkOperatorContract = ChainlinkOperator.bind(chainlinkOperatorAddress);
-  let underlying = loadOrCreateToken(pool.underlying);
   swap.swapFeeUsd = scaleTokenAmount(chainlinkOperatorContract.getNormalizedPrice(underlying.symbol), 18).times(
     swap.swapFee,
   );
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
-  swap.underlyingAmount = underlyingAmount;
+  swap.underlyingAmount = underlyingAmountBd;
   swap.save();
 
   pool.underlyingReserve = newUnderlyingReserve;
   pool.hTokenReserve = newHTokenReserve;
-
   pool.save();
 }
