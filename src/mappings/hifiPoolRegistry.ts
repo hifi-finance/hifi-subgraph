@@ -1,8 +1,8 @@
 import { log, store } from "@graphprotocol/graph-ts";
 
-import { createPool } from "../helpers";
+import { createPool, loadOrCreateHifi } from "../helpers";
 import { TrackPool, UntrackPool } from "../types/HifiPoolRegistry/HifiPoolRegistry";
-import { Pool } from "../types/schema";
+import { Hifi, Pool } from "../types/schema";
 
 export function handleTrackPool(event: TrackPool): void {
   let poolId: string = event.params.pool.toHexString();
@@ -12,6 +12,12 @@ export function handleTrackPool(event: TrackPool): void {
     return;
   }
   createPool(poolId);
+
+  let hifi: Hifi = loadOrCreateHifi();
+  let pools: string[] = hifi.pools;
+  pools.push(poolId);
+  hifi.pools = pools;
+  hifi.save();
 }
 
 export function handleUntrackPool(event: UntrackPool): void {

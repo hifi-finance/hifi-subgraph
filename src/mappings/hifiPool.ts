@@ -94,32 +94,33 @@ export function handleTrade(event: Trade): void {
 
   let hTokenAmount: BigInt = event.params.hTokenAmount;
   let hTokenAmountBd: BigDecimal = scaleTokenAmount(hTokenAmount, bond.decimals);
-  let newHTokenReserve = pool.hTokenReserve.minus(hTokenAmountBd);
+  let newHTokenReserveBd: BigDecimal = pool.hTokenReserve.minus(hTokenAmountBd);
   let underlyingAmount: BigInt = event.params.underlyingAmount;
   let underlyingAmountBd: BigDecimal = scaleTokenAmount(underlyingAmount, underlying.decimals);
-  let newUnderlyingReserve = pool.underlyingReserve.minus(underlyingAmountBd);
-  let totalSupply = scaleTokenAmount(HifiPool.bind(event.address).totalSupply(), 18);
-  let t = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
-  let oneMinusT = parseFloat("1") - t;
-  let a = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
-  let b = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
-  let c = Math.pow(parseFloat(newHTokenReserve.toString()) + parseFloat(totalSupply.toString()), oneMinusT);
-  let newUnderlyingReserveWithoutFee = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
-  let diff = Math.abs(parseFloat(newUnderlyingReserve.toString()) - newUnderlyingReserveWithoutFee);
+  let newUnderlyingReserveBd: BigDecimal = pool.underlyingReserve.minus(underlyingAmountBd);
+  let totalSupply: BigInt = HifiPool.bind(event.address).totalSupply();
+  let totalSupplyBd: BigDecimal = scaleTokenAmount(totalSupply, 18);
+  let t: number = parseFloat(event.params.maturity.minus(event.block.timestamp).toString()) / parseFloat("126144000");
+  let oneMinusT: number = parseFloat("1") - t;
+  let a: number = Math.pow(parseFloat(pool.underlyingReserve.toString()), oneMinusT);
+  let b: number = Math.pow(parseFloat(pool.hTokenReserve.toString()) + parseFloat(totalSupplyBd.toString()), oneMinusT);
+  let c: number = Math.pow(parseFloat(newHTokenReserveBd.toString()) + parseFloat(totalSupplyBd.toString()), oneMinusT);
+  let newUnderlyingReserveWithoutFee: number = Math.pow(Math.abs(a + b - c), parseFloat("1") / oneMinusT);
+  let diff: number = Math.abs(parseFloat(newUnderlyingReserveBd.toString()) - newUnderlyingReserveWithoutFee);
   swap.from = event.params.from;
   swap.hTokenAmount = hTokenAmountBd;
   swap.pool = pool.id;
   swap.swapFee = BigDecimal.fromString(diff.toString());
-  let chainlinkOperatorContract = ChainlinkOperator.bind(chainlinkOperatorAddress);
-  swap.swapFeeUsd = scaleTokenAmount(chainlinkOperatorContract.getNormalizedPrice(underlying.symbol), 18).times(
-    swap.swapFee,
-  );
+  let chainlinkOperatorContract: ChainlinkOperator = ChainlinkOperator.bind(chainlinkOperatorAddress);
+  let normalizedPrice: BigInt = chainlinkOperatorContract.getNormalizedPrice(underlying.symbol);
+  let normalizedPriceBd: BigDecimal = scaleTokenAmount(normalizedPrice, 18);
+  swap.swapFeeUsd = normalizedPriceBd.times(swap.swapFee);
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
   swap.underlyingAmount = underlyingAmountBd;
   swap.save();
 
-  pool.underlyingReserve = newUnderlyingReserve;
-  pool.hTokenReserve = newHTokenReserve;
+  pool.underlyingReserve = newUnderlyingReserveBd;
+  pool.hTokenReserve = newHTokenReserveBd;
   pool.save();
 }

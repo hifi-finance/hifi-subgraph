@@ -28,28 +28,24 @@ export function createPool(id: string): Pool {
   // Bind the HifiPool contract and read its state.
   let pool: Pool = new Pool(id);
   let contract: HifiPoolContract = HifiPoolContract.bind(hifiPoolAddress);
-  let hToken = loadOrCreateToken(contract.hToken().toHexString());
-  let underlying = loadOrCreateToken(contract.underlying().toHexString());
+  let hTokenId: string = contract.hToken().toHexString();
+  let hToken: Token = loadOrCreateToken(hTokenId);
+  let underlyingId: string = contract.underlying().toHexString();
+  let underlying: Token = loadOrCreateToken(underlyingId);
   pool.hToken = hToken.id;
   pool.hTokenReserve = zeroBd;
   pool.maturity = contract.maturity();
   pool.underlying = underlying.id;
   pool.underlyingReserve = zeroBd;
   pool.save();
-
-  // Push newly-created pool to the AMM.
-  let hifi = loadOrCreateHifi();
-  let pools = hifi.pools;
-  pools.push(pool.id);
-  hifi.pools = pools;
-  hifi.save();
-
   return pool;
 }
 
-export function createPosition(account: Address, tokenId: Address): Position {
-  let position: Position = new Position(getAccountTokenId(account.toHexString(), tokenId.toHexString()));
-  let token = loadOrCreateToken(tokenId.toHexString());
+export function createPosition(account: Address, asset: Address): Position {
+  let positionId: string = getAccountTokenId(account.toHexString(), asset.toHexString());
+  let position: Position = new Position(positionId);
+  let tokenId: string = asset.toHexString();
+  let token: Token = loadOrCreateToken(tokenId);
   position.amount = zeroBd;
   position.token = token.id;
   position.save();
@@ -91,10 +87,13 @@ export function loadOrCreatePool(id: string): Pool {
   return pool as Pool;
 }
 
-export function loadOrCreatePosition(account: Address, tokenId: Address): Position {
-  let position: Position | null = Position.load(getAccountTokenId(account.toHexString(), tokenId.toHexString()));
+export function loadOrCreatePosition(account: Address, asset: Address): Position {
+  let accountId: string = account.toHexString();
+  let tokenId: string = asset.toHexString();
+  let positionId: string = getAccountTokenId(accountId, tokenId);
+  let position: Position | null = Position.load(positionId);
   if (position == null) {
-    position = createPosition(account, tokenId);
+    position = createPosition(account, asset);
   }
   return position as Position;
 }
