@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, log, store } from "@graphprotocol/graph-ts";
 
 import {
   getAccountTokenId,
@@ -6,6 +6,7 @@ import {
   loadOrCreatePosition,
   loadOrCreateVault,
   scaleTokenAmount,
+  zeroBd,
 } from "../helpers";
 import {
   Borrow,
@@ -86,6 +87,10 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let seizedCollateralAmountBd: BigDecimal = scaleTokenAmount(seizedCollateralAmount, collateral.decimals);
   position.amount = position.amount.minus(seizedCollateralAmountBd);
   position.save();
+
+  if (position.amount.equals(zeroBd)) {
+    store.remove("Position", positionId);
+  }
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
@@ -110,6 +115,10 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let repayAmountBd: BigDecimal = scaleTokenAmount(repayAmount, bond.decimals);
   position.amount = position.amount.minus(repayAmountBd);
   position.save();
+
+  if (position.amount.equals(zeroBd)) {
+    store.remove("Position", positionId);
+  }
 }
 
 export function handleWithdrawCollateral(event: WithdrawCollateral): void {
@@ -132,4 +141,8 @@ export function handleWithdrawCollateral(event: WithdrawCollateral): void {
   let collateralAmountBd: BigDecimal = scaleTokenAmount(collateralAmount, collateral.decimals);
   position.amount = position.amount.minus(collateralAmountBd);
   position.save();
+
+  if (position.amount.equals(zeroBd)) {
+    store.remove("Position", positionId);
+  }
 }
