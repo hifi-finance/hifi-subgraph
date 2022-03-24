@@ -15,6 +15,7 @@
     "@commitlint/config-conventional": "^12.1.4",
     "@graphprotocol/graph-cli": "^0.22.1",
     "@graphprotocol/graph-ts": "^0.22.1",
+    "@trivago/prettier-plugin-sort-imports": "^3.2.0",
     "@types/node": "^15.12.2",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
@@ -51,7 +52,7 @@
     "prepare:mainnet": "./scripts/mustache.sh mainnet",
     "prepare:matic": "./scripts/mustache.sh matic",
     "prepare:rinkeby": "./scripts/mustache.sh rinkeby",
-    "prettier": "prettier --config .prettierrc --write \"**/*.{js,json,md,ts,yaml,yml}\"",
-    "prettier:check": "prettier --config .prettierrc --check \"**/*.{js,json,md,ts,yaml,yml}\""
+    "prettier": "prettier --config .prettierrc.yaml --write \"**/*.{js,json,md,ts,yaml,yml}\"",
+    "prettier:check": "prettier --config .prettierrc.yaml --check \"**/*.{js,json,md,ts,yaml,yml}\""
   }
 }
