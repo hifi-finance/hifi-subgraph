@@ -32,6 +32,3 @@ jobs:
 
       - name: "Deploy to Matic"
         run: "yarn run deploy:matic --access-token ${{ secrets.THE_GRAPH_TOKEN }}"
-
-      - name: "Deploy to Rinkeby"
-        run: "yarn run deploy:rinkeby --access-token ${{ secrets.THE_GRAPH_TOKEN }}"

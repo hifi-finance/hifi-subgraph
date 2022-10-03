@@ -45,13 +45,11 @@
     "deploy": "graph deploy $SUBGRAPH_NAME --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "deploy:mainnet": "yarn run prepare:mainnet && SUBGRAPH_NAME=hifi-finance/hifi-v1 yarn deploy",
     "deploy:matic": "yarn run prepare:matic && SUBGRAPH_NAME=hifi-finance/hifi-v1-matic yarn deploy",
-    "deploy:rinkeby": "yarn run prepare:rinkeby && SUBGRAPH_NAME=hifi-finance/hifi-v1-rinkeby yarn deploy",
     "lint": "yarn lint:ts . && yarn prettier:check",
     "lint:ts": "eslint --config ./.eslintrc.yaml --ignore-path ./.eslintignore --ext .js,.ts .",
     "postinstall": "husky install",
     "prepare:mainnet": "./scripts/mustache.sh mainnet",
     "prepare:matic": "./scripts/mustache.sh matic",
-    "prepare:rinkeby": "./scripts/mustache.sh rinkeby",
     "prettier": "prettier --config .prettierrc.yaml --write \"**/*.{js,json,md,ts,yaml,yml}\"",
     "prettier:check": "prettier --config .prettierrc.yaml --check \"**/*.{js,json,md,ts,yaml,yml}\""
   }
