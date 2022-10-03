@@ -101,9 +101,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
     return;
   }
 
-  // Line below is a work-around for a bug outlined here:
-  // https://github.com/hifi-finance/hifi/issues/76
-  let borrowerId: string = event.params.payer.toHexString();
+  let borrowerId: string = event.params.borrower.toHexString();
   let positionId: string = getAccountTokenId(borrowerId, bondId);
   let position: Position | null = Position.load(positionId);
   if (position == null) {
