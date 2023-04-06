@@ -1,36 +1,98 @@
 # Hifi Subgraph
 
-Hifi is a fixed-rate, fixed-term lending protocol built on the Ethereum blockchain. This subgraph indexes the events
-emitted by our smart contracts.
+[Hifi](https://hifi.finance) is a fixed-rate, fixed-term lending protocol on Ethereum. This subgraph tracks the Hifi Finance lending protocol data, including positions, tokens, vaults, pools, and swaps.
 
-You can interact with the subgraph via The Graph's [hosted service](https://thegraph.com/legacy-explorer/subgraph/hifi-finance/hifi-v1).
+## Features
+
+- Data on positions, tokens, vaults, pools, and swaps
+- Aggregated data across Hifi entities
+- Historical data on Hifi entities
+
+## Running Locally
+
+Make sure to update package.json settings to point to your own graph account.
 
 ## Queries
 
-Below are a few ways to show how to query the Hifi Subgraph for data. The queries show most of the information
-that is queryable, but there are many other filtering options that can be used, just check out the querying api.
+You can use the following entities to query the Hifi subgraph for data: Position, Token, Hifi, Vault, Pool, and Swap. Check out the [querying api](https://thegraph.com/docs/en/querying/graphql-api/) for more filtering options. These queries can be used locally or in The Graph Explorer playground.
 
-You can also see the saved queries on the hosted service for examples.
+## Key Entity Overviews
 
-### Vaults
+#### Position
+
+Represents a collateral or debt position.
+
+#### Token
+
+Represents a basic ERC20 token.
+
+#### Hifi
+
+High-level overview of the Hifi Finance protocol.
+
+#### Vault
+
+Stores the collaterals deposited by the user, along with the debts.
+
+#### Pool
+
+Stores the AMM pool reserves, along with the swaps.
+
+#### Swap
+
+Contains data on specific AMM swaps.
+
+## Example Queries
+
+### Querying Aggregated Hifi Data
+
+This query fetches aggregated data from all Hifi entities to give a view of the overall activity in the Hifi Finance protocol.
 
 ```graphql
 {
-  vaults(first: 5) {
-    id
-    createTime
-    collaterals {
+  hifi(id: "1") {
+    listedBonds {
       id
-      amount
-      token {
+      name
+      symbol
+    }
+    listedCollaterals {
+      id
+      name
+      symbol
+    }
+    pools {
+      id
+      hToken {
         id
+        name
+        symbol
+      }
+      underlying {
+        id
+        name
+        symbol
       }
     }
-    debts {
+    vaults {
       id
-      amount
-      token {
+      collaterals {
         id
+        amount
+        token {
+          id
+          name
+          symbol
+        }
+      }
+      debts {
+        id
+        amount
+        token {
+          id
+          name
+          symbol
+        }
       }
     }
   }
