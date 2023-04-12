@@ -87,8 +87,6 @@ type Swap @entity {
   pool: Pool!
   "Fee paid by user for swap (in underlying)"
   swapFee: BigDecimal!
-  "Fee paid by user for swap (in USD)"
-  swapFeeUsd: BigDecimal!
   "Timestamp for when the swap happened"
   timestamp: BigInt!
   "Account that receives token being bought"

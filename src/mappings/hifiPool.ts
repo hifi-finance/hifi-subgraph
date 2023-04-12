@@ -1,8 +1,7 @@
 import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
-import { chainlinkOperatorAddress, scaleTokenAmount } from "../helpers";
+import { scaleTokenAmount } from "../helpers";
 import { Pool, Swap, Token } from "../types/schema";
-import { ChainlinkOperator } from "../types/templates/HifiPool/ChainlinkOperator";
 import { AddLiquidity, HifiPool, RemoveLiquidity, Trade } from "../types/templates/HifiPool/HifiPool";
 
 export function handleAddLiquidity(event: AddLiquidity): void {
@@ -111,10 +110,6 @@ export function handleTrade(event: Trade): void {
   swap.hTokenAmount = hTokenAmountBd;
   swap.pool = pool.id;
   swap.swapFee = BigDecimal.fromString(diff.toString());
-  let chainlinkOperatorContract: ChainlinkOperator = ChainlinkOperator.bind(chainlinkOperatorAddress);
-  let normalizedPrice: BigInt = chainlinkOperatorContract.getNormalizedPrice(underlying.symbol);
-  let normalizedPriceBd: BigDecimal = scaleTokenAmount(normalizedPrice, 18);
-  swap.swapFeeUsd = normalizedPriceBd.times(swap.swapFee);
   swap.timestamp = event.block.timestamp;
   swap.to = event.params.to;
   swap.underlyingAmount = underlyingAmountBd;

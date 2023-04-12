@@ -2,20 +2,20 @@
   "network": "mainnet",
   "contracts": {
     "balanceSheet": {
-      "address": "",
-      "startBlock": 0
+      "address": "0x452467A37f7A0c1EA8432A52b8bbe3Cc31E9513b",
+      "startBlock": 16228745
     },
     "chainlinkOperator": {
-      "address": "",
-      "startBlock": 0
+      "address": "0xaFf0bb2f5C6E773ceE07E9465968f91Ca12A7EFe",
+      "startBlock": 16228664
     },
     "fintroller": {
-      "address": "",
-      "startBlock": 0
+      "address": "0xEe46E4B672286392Fcb5308A58dCDb8f0bFcA8c3",
+      "startBlock": 16228717
     },
     "hifiPoolRegistry": {
-      "address": "",
-      "startBlock": 0
+      "address": "0xbfFa648d87f1df00a82A6169D6AC38E9d990b0bC",
+      "startBlock": 16229046
     }
   }
 }

@@ -48,6 +48,16 @@
     "anonymous": false,
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+      { "indexed": false, "internalType": "address", "name": "oldFintroller", "type": "address" },
+      { "indexed": false, "internalType": "address", "name": "newFintroller", "type": "address" }
+    ],
+    "name": "SetFintroller",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
       { "indexed": false, "internalType": "address", "name": "oldOracle", "type": "address" },
       { "indexed": false, "internalType": "address", "name": "newOracle", "type": "address" }
     ],
@@ -72,13 +82,6 @@
     ],
     "name": "WithdrawCollateral",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "__OwnableUpgradeable__init",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   { "inputs": [], "name": "_renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
@@ -111,7 +114,7 @@
   {
     "inputs": [],
     "name": "fintroller",
-    "outputs": [{ "internalType": "contract IFintrollerV1", "name": "", "type": "address" }],
+    "outputs": [{ "internalType": "contract IFintroller", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -199,7 +202,7 @@
   },
   {
     "inputs": [
-      { "internalType": "contract IFintrollerV1", "name": "fintroller_", "type": "address" },
+      { "internalType": "contract IFintroller", "name": "fintroller_", "type": "address" },
       { "internalType": "contract IChainlinkOperator", "name": "oracle_", "type": "address" }
     ],
     "name": "initialize",
@@ -250,6 +253,13 @@
       { "internalType": "uint256", "name": "repayAmount", "type": "uint256" }
     ],
     "name": "repayBorrowBehalf",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "contract IFintroller", "name": "newFintroller", "type": "address" }],
+    "name": "setFintroller",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

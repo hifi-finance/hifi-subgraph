@@ -77,6 +77,16 @@
       { "indexed": true, "internalType": "contract IHToken", "name": "bond", "type": "address" },
       { "indexed": false, "internalType": "bool", "name": "state", "type": "bool" }
     ],
+    "name": "SetDepositUnderlyingAllowed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
+      { "indexed": true, "internalType": "contract IHToken", "name": "bond", "type": "address" },
+      { "indexed": false, "internalType": "bool", "name": "state", "type": "bool" }
+    ],
     "name": "SetLiquidateBorrowAllowed",
     "type": "event"
   },
@@ -105,10 +115,10 @@
     "anonymous": false,
     "inputs": [
       { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
-      { "indexed": true, "internalType": "contract IHToken", "name": "bond", "type": "address" },
-      { "indexed": false, "internalType": "bool", "name": "state", "type": "bool" }
+      { "indexed": false, "internalType": "uint256", "name": "oldMaxCollaterals", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "newMaxCollaterals", "type": "uint256" }
     ],
-    "name": "SetRedeemHTokensAllowed",
+    "name": "SetMaxCollaterals",
     "type": "event"
   },
   {
@@ -124,28 +134,11 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" },
-      { "indexed": true, "internalType": "contract IHToken", "name": "bond", "type": "address" },
-      { "indexed": false, "internalType": "bool", "name": "state", "type": "bool" }
-    ],
-    "name": "SetSupplyUnderlyingAllowed",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
       { "indexed": true, "internalType": "address", "name": "oldOwner", "type": "address" },
       { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
     ],
     "name": "TransferOwnership",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "__OwnableUpgradeable__init",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   { "inputs": [], "name": "_renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
@@ -163,13 +156,12 @@
         "components": [
           { "internalType": "uint256", "name": "debtCeiling", "type": "uint256" },
           { "internalType": "bool", "name": "isBorrowAllowed", "type": "bool" },
+          { "internalType": "bool", "name": "isDepositUnderlyingAllowed", "type": "bool" },
           { "internalType": "bool", "name": "isLiquidateBorrowAllowed", "type": "bool" },
           { "internalType": "bool", "name": "isListed", "type": "bool" },
-          { "internalType": "bool", "name": "isRedeemHTokenAllowed", "type": "bool" },
-          { "internalType": "bool", "name": "isRepayBorrowAllowed", "type": "bool" },
-          { "internalType": "bool", "name": "isSupplyUnderlyingAllowed", "type": "bool" }
+          { "internalType": "bool", "name": "isRepayBorrowAllowed", "type": "bool" }
         ],
-        "internalType": "struct SFintrollerV1.Bond",
+        "internalType": "struct IFintroller.Bond",
         "name": "",
         "type": "tuple"
       }
@@ -196,7 +188,7 @@
           { "internalType": "bool", "name": "isDepositCollateralAllowed", "type": "bool" },
           { "internalType": "bool", "name": "isListed", "type": "bool" }
         ],
-        "internalType": "struct SFintrollerV1.Collateral",
+        "internalType": "struct IFintroller.Collateral",
         "name": "",
         "type": "tuple"
       }
@@ -234,6 +226,13 @@
   },
   {
     "inputs": [{ "internalType": "contract IHToken", "name": "bond", "type": "address" }],
+    "name": "getDepositUnderlyingAllowed",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "contract IHToken", "name": "bond", "type": "address" }],
     "name": "getLiquidateBorrowAllowed",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
@@ -253,7 +252,6 @@
     "stateMutability": "view",
     "type": "function"
   },
-  { "inputs": [], "name": "initialize", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
     "inputs": [{ "internalType": "contract IHToken", "name": "bond", "type": "address" }],
     "name": "isBondListed",
@@ -285,6 +283,13 @@
   {
     "inputs": [],
     "name": "maxBonds",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxCollaterals",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
@@ -351,6 +356,16 @@
       { "internalType": "contract IHToken", "name": "bond", "type": "address" },
       { "internalType": "bool", "name": "state", "type": "bool" }
     ],
+    "name": "setDepositUnderlyingAllowed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "contract IHToken", "name": "bond", "type": "address" },
+      { "internalType": "bool", "name": "state", "type": "bool" }
+    ],
     "name": "setLiquidateBorrowAllowed",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -369,6 +384,13 @@
   {
     "inputs": [{ "internalType": "uint256", "name": "newMaxBonds", "type": "uint256" }],
     "name": "setMaxBonds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "newMaxCollaterals", "type": "uint256" }],
+    "name": "setMaxCollaterals",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -20,6 +20,15 @@
   {
     "anonymous": false,
     "inputs": [
+      { "indexed": false, "internalType": "uint256", "name": "oldPriceStalenessThreshold", "type": "uint256" },
+      { "indexed": false, "internalType": "uint256", "name": "newPriceStalenessThreshold", "type": "uint256" }
+    ],
+    "name": "SetPriceStalenessThreshold",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
       { "indexed": true, "internalType": "address", "name": "oldOwner", "type": "address" },
       { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
     ],
@@ -88,11 +97,25 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "priceStalenessThreshold",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "contract IErc20", "name": "asset", "type": "address" },
       { "internalType": "contract IAggregatorV3", "name": "feed", "type": "address" }
     ],
     "name": "setFeed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "newPriceStalenessThreshold", "type": "uint256" }],
+    "name": "setPriceStalenessThreshold",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
