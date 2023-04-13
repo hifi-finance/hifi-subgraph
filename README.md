@@ -2,15 +2,41 @@
 
 [Hifi](https://hifi.finance) is a fixed-rate, fixed-term lending protocol on Ethereum. This subgraph tracks the Hifi Finance lending protocol data, including positions, tokens, vaults, pools, and swaps.
 
+## Prerequisites
+
+- NVM
+- Yarn package manager
+
+## Set Up
+
+1. Clone the repository:
+
+```bash
+$ git clone https://github.com/hifi-finance/hifi-subgraph.git
+$ cd hifi-subgraph
+```
+
+2. Set the version of Node to use locally within the project:
+
+```bash
+$ nvm use
+```
+
+3. Install the dependencies with Yarn:
+
+```bash
+$ yarn install
+```
+
+## Running Locally
+
+Make sure to update package.json settings to point to your own graph account.
+
 ## Features
 
 - Data on positions, tokens, vaults, pools, and swaps
 - Aggregated data across Hifi entities
 - Historical data on Hifi entities
-
-## Running Locally
-
-Make sure to update package.json settings to point to your own graph account.
 
 ## Queries
 
